@@ -3,7 +3,6 @@ import GameObject from "./models/game-object";
 import PlayerColor from "./models/player-color";
 import Ship from "./core/ship";
 import { MAP_HEIGHT, MAP_WIDTH } from "./utils/constants";
-import ShipController from "./core/ship-controller";
 
 const sceneContainer = document.querySelector(".scene") as HTMLDivElement;
 const gameObjects: Array<GameObject> = [];
@@ -25,30 +24,31 @@ background.tint = "#99e0f2";
 background.width = MAP_WIDTH;
 background.height = MAP_HEIGHT;
 
-sceneContainer.appendChild(app.view);
+background.on("click", (event) => {
+  mouseCoords.x = event.global.x;
+  mouseCoords.y = event.global.y;
+
+  // TODO: Testing ship movement
+  gameObjects.forEach((gameObject) => {
+    (gameObject as Ship).goTo(mouseCoords);
+  });
+});
 
 app.stage.addChild(background);
+sceneContainer.appendChild(app.view);
 
 players.forEach((player) => {
   const ship = new Ship(player.color);
   const { x, y } = player.initialPosition;
-  ship.setPosition(x, y);
-  ship.setRotation(player.initialRotation);
+  ship.position = new PIXI.Point(x, y);
+  ship.rotation = player.initialRotation;
 
   gameObjects.push(ship);
   app.stage.addChild(ship.displayObject);
 });
 
-background.on("click", (event) => {
-  mouseCoords.x = event.global.x;
-  mouseCoords.y = event.global.y;
-});
-
-const shipController = new ShipController(gameObjects[0] as Ship);
-
 app.ticker.add((delta) => {
-  const newPosition = shipController.goTo(mouseCoords);
-  const playerShip = gameObjects[0];
-
-  playerShip.setPosition(newPosition.x * delta, newPosition.y * delta);
+  for (const gameObject of gameObjects) {
+    gameObject.update(delta);
+  }
 });

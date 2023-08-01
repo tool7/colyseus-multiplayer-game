@@ -1,14 +1,22 @@
 import * as PIXI from "pixi.js";
 
-import { SHIP_HULL_SPRITE_SRC, PLAYER_COLOR_SHIP_SAILS_SPRITES } from "../utils/constants";
+import {
+  SHIP_HULL_SPRITE_SRC,
+  PLAYER_COLOR_SHIP_SAILS_SPRITES,
+  SHIP_DEFAULT_VELOCITY,
+  SHIP_TARGET_HALT_MIN_DISTANCE,
+} from "../utils/constants";
+import { distanceBetweenPoints } from "../utils/point";
 import GameObject from "../models/game-object";
 import PlayerColor from "../models/player-color";
 
 class Ship implements GameObject {
   private hull: PIXI.Sprite;
   private sails: PIXI.Sprite;
-
-  container: PIXI.Container;
+  private container: PIXI.Container;
+  private velocity: number;
+  private direction: PIXI.Point;
+  private destination: PIXI.Point;
 
   constructor(playerColor: PlayerColor) {
     this.container = new PIXI.Container();
@@ -29,18 +37,49 @@ class Ship implements GameObject {
 
     this.container.addChild(this.hull);
     this.container.addChild(this.sails);
+
+    this.velocity = SHIP_DEFAULT_VELOCITY;
+    this.direction = new PIXI.Point();
+    this.destination = new PIXI.Point();
   }
 
   get displayObject() {
     return this.container;
   }
-
-  setPosition(x: number, y: number) {
+  get position() {
+    return this.container.position;
+  }
+  set position({ x, y }: PIXI.Point) {
     this.container.position.set(x, y);
   }
-
-  setRotation(radians: number) {
+  get rotation() {
+    return this.container.rotation;
+  }
+  set rotation(radians: number) {
     this.container.rotation = radians;
+  }
+
+  goTo(target: PIXI.Point): void {
+    this.destination = target;
+
+    const dx = target.x - this.container.x;
+    const dy = target.y - this.container.y;
+    const angle = Math.atan2(dy, dx);
+
+    this.direction.x = Math.cos(angle);
+    this.direction.y = Math.sin(angle);
+  }
+
+  update(delta: number): void {
+    const distance = distanceBetweenPoints(this.container.position, this.destination);
+
+    if (distance < SHIP_TARGET_HALT_MIN_DISTANCE) {
+      this.container.x = this.destination.x;
+      this.container.y = this.destination.y;
+    } else {
+      this.container.position.x += this.direction.x * this.velocity * delta;
+      this.container.position.y += this.direction.y * this.velocity * delta;
+    }
   }
 }
 

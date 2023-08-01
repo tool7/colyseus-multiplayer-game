@@ -9,6 +9,9 @@ import PlayerColor from "../models/player-color";
 const MAP_WIDTH = 4000;
 const MAP_HEIGHT = 2000;
 
+const SHIP_DEFAULT_VELOCITY = 1;
+const SHIP_TARGET_HALT_MIN_DISTANCE = 1;
+
 const SHIP_HULL_SPRITE_SRC = hullBase64;
 const PLAYER_COLOR_SHIP_SAILS_SPRITES: Record<PlayerColor, string> = {
   [PlayerColor.RED]: sailsRedBase64,
@@ -17,4 +20,11 @@ const PLAYER_COLOR_SHIP_SAILS_SPRITES: Record<PlayerColor, string> = {
   [PlayerColor.YELLOW]: sailsYellowBase64,
 };
 
-export { MAP_WIDTH, MAP_HEIGHT, SHIP_HULL_SPRITE_SRC, PLAYER_COLOR_SHIP_SAILS_SPRITES };
+export {
+  MAP_WIDTH,
+  MAP_HEIGHT,
+  SHIP_DEFAULT_VELOCITY,
+  SHIP_TARGET_HALT_MIN_DISTANCE,
+  SHIP_HULL_SPRITE_SRC,
+  PLAYER_COLOR_SHIP_SAILS_SPRITES,
+};
