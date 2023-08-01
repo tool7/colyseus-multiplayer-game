@@ -1,8 +1,8 @@
 import * as PIXI from "pixi.js";
 
 import { SHIP_HULL_SPRITE_SRC, PLAYER_COLOR_SHIP_SAILS_SPRITES } from "../utils/constants";
-import GameObject from "./game-object";
-import PlayerColor from "./player-color";
+import GameObject from "../models/game-object";
+import PlayerColor from "../models/player-color";
 
 class Ship implements GameObject {
   private hull: PIXI.Sprite;
