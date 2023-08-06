@@ -1,22 +1,23 @@
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 
+import { MAP_HEIGHT, MAP_WIDTH } from "./utils/constants";
+import { interpolateFromOneRangeToAnother } from "./utils/helpers";
 import GameObject from "./models/game-object";
 import PlayerColor from "./models/player-color";
 import Ship from "./core/ship";
-import { MAP_HEIGHT, MAP_WIDTH } from "./utils/constants";
-import { interpolateFromOneRangeToAnother } from "./utils/helpers";
+import CameraState from "./core/camera-state";
+import MouseAreaSelection from "./core/mouse-area-selection";
 
 const gameContainer = document.querySelector(".game") as HTMLDivElement;
 const gameObjects: Array<GameObject> = [];
 const mouseCoords = new PIXI.Point(0, 0);
-const selectedAreaStartPosition = new PIXI.Point();
 let selectedShips: Array<Ship> = [];
 
 const players = [
-  { initialPosition: { x: 100, y: 100 }, initialRotation: -1, color: PlayerColor.RED },
-  { initialPosition: { x: 500, y: 700 }, initialRotation: Math.PI, color: PlayerColor.GREEN },
-  { initialPosition: { x: 800, y: 100 }, initialRotation: 1, color: PlayerColor.BLUE },
+  { initialPosition: { x: 200, y: 200 }, initialRotation: -1, color: PlayerColor.RED },
+  { initialPosition: { x: 1000, y: 1600 }, initialRotation: Math.PI, color: PlayerColor.GREEN },
+  { initialPosition: { x: 2000, y: 200 }, initialRotation: 1, color: PlayerColor.BLUE },
 ];
 
 const app = new PIXI.Application<HTMLCanvasElement>({
@@ -51,6 +52,11 @@ viewport
 viewport.fit();
 viewport.moveCenter(MAP_WIDTH / 2, MAP_HEIGHT / 2);
 
+CameraState.setZoomLevel(viewport.scaled);
+viewport.on("zoomed", () => {
+  CameraState.setZoomLevel(viewport.scaled);
+});
+
 const background = new PIXI.Sprite(PIXI.Texture.WHITE);
 background.eventMode = "static";
 background.tint = "#99e0f2";
@@ -70,43 +76,6 @@ background.on("rightclick", (e) => {
   });
 });
 
-// ===== SELECTION CONTROLS =====
-viewport.on("mousedown", (e) => {
-  selectedShips = [];
-
-  const { x, y } = e.global;
-  selectedAreaStartPosition.set(x, y);
-});
-viewport.on("mouseup", (e) => {
-  const selectedAreaUpperLeftX = Math.min(selectedAreaStartPosition.x, e.global.x);
-  const selectedAreaUpperLeftY = Math.min(selectedAreaStartPosition.y, e.global.y);
-  const selectedAreaWidth = Math.abs(selectedAreaStartPosition.x - e.global.x);
-  const selectedAreaHeight = Math.abs(selectedAreaStartPosition.y - e.global.y);
-  const selectedArea = new PIXI.Rectangle(
-    selectedAreaUpperLeftX,
-    selectedAreaUpperLeftY,
-    selectedAreaWidth,
-    selectedAreaHeight
-  );
-
-  // console.log("x", selectedAreaUpperLeftX);
-  // console.log("y", selectedAreaUpperLeftY);
-  // console.log("width", selectedAreaWidth);
-  // console.log("height", selectedAreaHeight);
-
-  selectedShips = (gameObjects as Array<Ship>).filter((ship) => {
-    const global = ship.displayObject.toGlobal(background.position);
-
-    // console.log("global", global.x, global.y);
-    // console.log("ship.position", ship.position.x, ship.position.y);
-
-    return selectedArea.contains(global.x, global.y);
-  });
-
-  console.log("selectedShips", selectedShips);
-});
-// ==============================
-
 players.forEach((player) => {
   const ship = new Ship(player.color);
   const { x, y } = player.initialPosition;
@@ -114,11 +83,25 @@ players.forEach((player) => {
   ship.rotation = player.initialRotation;
 
   ship.displayObject.on("click", () => {
+    selectedShips.forEach((ship) => ship.setSelected(false));
+    ship.setSelected(true);
     selectedShips = [ship];
   });
 
   gameObjects.push(ship);
   viewport.addChild(ship.displayObject);
+});
+
+const mouseAreaSelection = new MouseAreaSelection(viewport);
+app.stage.addChild(mouseAreaSelection.displayObject);
+
+mouseAreaSelection.selectionEvent.on("select", (area: PIXI.Rectangle) => {
+  selectedShips.forEach((ship) => ship.setSelected(false));
+  selectedShips = (gameObjects as Array<Ship>).filter((ship) => {
+    const global = ship.displayObject.toGlobal(background.position);
+    return area.contains(global.x, global.y);
+  });
+  selectedShips.forEach((ship) => ship.setSelected(true));
 });
 
 app.ticker.add((delta) => {

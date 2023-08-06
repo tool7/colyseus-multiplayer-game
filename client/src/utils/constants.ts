@@ -19,6 +19,7 @@ const PLAYER_COLOR_SHIP_SAILS_SPRITES: Record<PlayerColor, string> = {
   [PlayerColor.BLUE]: sailsBlueBase64,
   [PlayerColor.YELLOW]: sailsYellowBase64,
 };
+const SHIP_SELECTION_INDICATOR_COLOR = 0x203e8c;
 
 export {
   MAP_WIDTH,
@@ -27,4 +28,5 @@ export {
   SHIP_TARGET_HALT_MIN_DISTANCE,
   SHIP_HULL_SPRITE_SRC,
   PLAYER_COLOR_SHIP_SAILS_SPRITES,
+  SHIP_SELECTION_INDICATOR_COLOR,
 };
