@@ -6,7 +6,7 @@ import {
   SHIP_DEFAULT_VELOCITY,
   SHIP_TARGET_HALT_MIN_DISTANCE,
 } from "../utils/constants";
-import { distanceBetweenPoints } from "../utils/point";
+import { distanceBetweenPoints } from "../utils/helpers";
 import GameObject from "../models/game-object";
 import PlayerColor from "../models/player-color";
 
@@ -37,6 +37,7 @@ class Ship implements GameObject {
 
     this.container.addChild(this.hull);
     this.container.addChild(this.sails);
+    this.container.eventMode = "static";
 
     this.velocity = SHIP_DEFAULT_VELOCITY;
     this.direction = new PIXI.Point();
@@ -60,7 +61,7 @@ class Ship implements GameObject {
   }
 
   goTo(target: PIXI.Point): void {
-    this.destination = target;
+    this.destination = new PIXI.Point(target.x, target.y);
 
     const dx = target.x - this.container.x;
     const dy = target.y - this.container.y;
