@@ -54,17 +54,12 @@ class Ship implements GameObject {
   get displayObject() {
     return this.container;
   }
-  get position() {
-    return this.container.position;
+  get transform() {
+    return this.container.transform;
   }
-  set position({ x, y }: PIXI.Point) {
-    this.container.position.set(x, y);
-  }
-  get rotation() {
-    return this.container.rotation;
-  }
-  set rotation(radians: number) {
-    this.container.rotation = radians;
+  set transform(t: PIXI.Transform) {
+    this.container.transform.position.set(t.position.x, t.position.y);
+    this.container.transform.rotation = t.rotation;
   }
 
   setSelected(isSelected: boolean) {

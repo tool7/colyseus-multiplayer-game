@@ -64,6 +64,7 @@ background.width = MAP_WIDTH;
 background.height = MAP_HEIGHT;
 viewport.addChild(background);
 
+// TODO: Extract player controls logic
 background.on("rightclick", (e) => {
   const localPosition = e.getLocalPosition(background);
   const x = interpolateFromOneRangeToAnother(localPosition.x, 0, 16, 0, MAP_WIDTH);
@@ -79,8 +80,10 @@ background.on("rightclick", (e) => {
 players.forEach((player) => {
   const ship = new Ship(player.color);
   const { x, y } = player.initialPosition;
-  ship.position = new PIXI.Point(x, y);
-  ship.rotation = player.initialRotation;
+  const transform = new PIXI.Transform();
+  transform.position.set(x, y);
+  transform.rotation = player.initialRotation;
+  ship.transform = transform;
 
   ship.displayObject.on("click", () => {
     selectedShips.forEach((ship) => ship.setSelected(false));

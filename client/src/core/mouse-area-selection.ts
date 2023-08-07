@@ -53,17 +53,12 @@ class MouseAreaSelection implements GameObject {
   get displayObject() {
     return this.selectedAreaGraphics;
   }
-  get position() {
-    return this.selectedAreaGraphics.position;
+  get transform() {
+    return this.selectedAreaGraphics.transform;
   }
-  set position({ x, y }: PIXI.Point) {
-    this.selectedAreaGraphics.position.set(x, y);
-  }
-  get rotation() {
-    return this.selectedAreaGraphics.rotation;
-  }
-  set rotation(radians: number) {
-    this.selectedAreaGraphics.rotation = radians;
+  set transform(t: PIXI.Transform) {
+    this.selectedAreaGraphics.transform.position.set(t.position.x, t.position.y);
+    this.selectedAreaGraphics.transform.rotation = t.rotation;
   }
 
   update(delta: number): void {}

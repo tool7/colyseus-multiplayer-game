@@ -2,11 +2,7 @@ import * as PIXI from "pixi.js";
 
 interface GameObject {
   displayObject: PIXI.DisplayObject;
-
-  // TODO: Change to PIXI.Transform
-  position: PIXI.Point;
-  rotation: number;
-
+  transform: PIXI.Transform;
   update: (delta: number) => void;
 }
 
