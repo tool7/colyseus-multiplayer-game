@@ -18,10 +18,13 @@ class MouseAreaSelection implements GameObject {
     this.selectionEvent = new PIXI.utils.EventEmitter();
 
     this.world.on("mousedown", (e) => {
-      this.selectedAreaGraphics.visible = true;
+      if (e.button !== 0) {
+        return;
+      }
 
       const { x, y } = e.global;
       this.selectedAreaStartPosition.set(x, y);
+      this.selectedAreaGraphics.visible = true;
     });
 
     this.world.on("mousemove", (e) => {
@@ -43,6 +46,10 @@ class MouseAreaSelection implements GameObject {
     });
 
     this.world.on("mouseup", () => {
+      if (!this.selectedAreaGraphics.visible) {
+        return;
+      }
+
       this.selectedAreaGraphics.clear();
       this.selectedAreaGraphics.visible = false;
 

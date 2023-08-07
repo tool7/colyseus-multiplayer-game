@@ -1,18 +1,20 @@
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
+import { Tilemap } from "@pixi/tilemap";
 
 import { MAP_HEIGHT, MAP_WIDTH } from "./utils/constants";
-import { interpolateFromOneRangeToAnother } from "./utils/helpers";
 import GameObject from "./models/game-object";
 import PlayerColor from "./models/player-color";
 import Ship from "./core/ship";
 import CameraState from "./core/camera-state";
 import MouseAreaSelection from "./core/mouse-area-selection";
+import seaTileBase64 from "./assets/sea_tile.png";
 
 const gameContainer = document.querySelector(".game") as HTMLDivElement;
 const gameObjects: Array<GameObject> = [];
 const mouseCoords = new PIXI.Point(0, 0);
 let selectedShips: Array<Ship> = [];
+let tiles: Array<Array<{ cost: string }>> = [[]];
 
 const players = [
   { initialPosition: { x: 200, y: 200 }, initialRotation: -1, color: PlayerColor.RED },
@@ -57,25 +59,40 @@ viewport.on("zoomed", () => {
   CameraState.setZoomLevel(viewport.scaled);
 });
 
-const background = new PIXI.Sprite(PIXI.Texture.WHITE);
-background.eventMode = "static";
-background.tint = "#99e0f2";
-background.width = MAP_WIDTH;
-background.height = MAP_HEIGHT;
-viewport.addChild(background);
+const seaTile = PIXI.Texture.from(seaTileBase64);
+const tilemap = new Tilemap([seaTile.baseTexture]);
 
-// TODO: Extract player controls logic
-background.on("rightclick", (e) => {
-  const localPosition = e.getLocalPosition(background);
-  const x = interpolateFromOneRangeToAnother(localPosition.x, 0, 16, 0, MAP_WIDTH);
-  const y = interpolateFromOneRangeToAnother(localPosition.y, 0, 16, 0, MAP_HEIGHT);
+viewport.on("rightclick", (e) => {
+  const { x, y } = e.getLocalPosition(viewport);
+  if (x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT) {
+    return;
+  }
+
   mouseCoords.x = x;
   mouseCoords.y = y;
 
   selectedShips.forEach((ship) => {
     ship.goTo(mouseCoords);
   });
+
+  // TODO: In progress
+  const i = Math.floor(x / seaTile.width);
+  const j = Math.floor(y / seaTile.height);
+  const clickedTile = tiles[i][j];
+  console.log(clickedTile);
 });
+
+window.onload = () => {
+  for (let i = 0; i < Math.round(MAP_WIDTH / seaTile.width); i++) {
+    tiles[i] = [];
+    for (let j = 0; j < Math.round(MAP_HEIGHT / seaTile.height); j++) {
+      tiles[i][j] = { cost: `${i}-${j}` };
+      tilemap.tile(seaTile, i * seaTile.width, j * seaTile.height);
+    }
+  }
+};
+
+viewport.addChild(tilemap);
 
 players.forEach((player) => {
   const ship = new Ship(player.color);
@@ -101,7 +118,7 @@ app.stage.addChild(mouseAreaSelection.displayObject);
 mouseAreaSelection.selectionEvent.on("select", (area: PIXI.Rectangle) => {
   selectedShips.forEach((ship) => ship.setSelected(false));
   selectedShips = (gameObjects as Array<Ship>).filter((ship) => {
-    const global = ship.displayObject.toGlobal(background.position);
+    const global = ship.displayObject.toGlobal(tilemap.position);
     return area.contains(global.x, global.y);
   });
   selectedShips.forEach((ship) => ship.setSelected(true));

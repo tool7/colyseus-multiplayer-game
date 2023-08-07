@@ -6,8 +6,8 @@ import sailsYellowBase64 from "../assets/ship_sails_yellow.png";
 
 import PlayerColor from "../models/player-color";
 
-const MAP_WIDTH = 4000;
-const MAP_HEIGHT = 2000;
+const MAP_WIDTH = 3840;
+const MAP_HEIGHT = 1920;
 
 const SHIP_DEFAULT_VELOCITY = 1;
 const SHIP_TARGET_HALT_MIN_DISTANCE = 1;
