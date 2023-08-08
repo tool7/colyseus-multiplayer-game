@@ -33,12 +33,12 @@ class Ship implements GameObject {
     this.hull = PIXI.Sprite.from(hullTexture);
     this.sails = PIXI.Sprite.from(sailsTexture);
 
-    this.hull.width = hullTexture.width;
-    this.hull.height = hullTexture.height;
+    this.hull.width = 50; // TODO: Better way to set width
+    this.hull.height = 108; // TODO: Better way to set height
     this.hull.anchor.set(0.5, 0.5);
 
-    this.sails.width = sailsTexture.width;
-    this.sails.height = sailsTexture.height;
+    this.sails.width = 66; // TODO: Better way to set width
+    this.sails.height = 113; // TODO: Better way to set height
     this.sails.anchor.set(0.5, 0.5);
 
     this.container.addChild(this.hull);

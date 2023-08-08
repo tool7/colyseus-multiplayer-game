@@ -61,13 +61,12 @@ window.onload = () => {
     mouseCoords.x = x;
     mouseCoords.y = y;
 
-    selectedShips.forEach((ship) => {
-      ship.goTo(mouseCoords);
-    });
+    // TODO: Testing purposes
+    worldMap.initializeFlowFieldAt(x, y);
 
-    // TODO: Testing tile click
-    const clickedTile = worldMap.getTileAtPosition(x, y);
-    console.log(clickedTile);
+    // selectedShips.forEach((ship) => {
+    //   ship.goTo(mouseCoords);
+    // });
   });
 
   players.forEach((player) => {
