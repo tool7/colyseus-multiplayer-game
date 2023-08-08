@@ -63,10 +63,6 @@ class MouseAreaSelection implements GameObject {
   get transform() {
     return this.selectedAreaGraphics.transform;
   }
-  set transform(t: PIXI.Transform) {
-    this.selectedAreaGraphics.transform.position.set(t.position.x, t.position.y);
-    this.selectedAreaGraphics.transform.rotation = t.rotation;
-  }
 
   update(delta: number): void {}
 }

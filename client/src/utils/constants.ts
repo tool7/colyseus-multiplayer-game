@@ -6,6 +6,8 @@ import sailsYellowBase64 from "../assets/ship_sails_yellow.png";
 
 import PlayerColor from "../models/player-color";
 
+const DEBUG_FLOW_FIELD_GRID_ENABLED = true;
+
 const MAP_WIDTH = 3840;
 const MAP_HEIGHT = 1920;
 
@@ -22,6 +24,7 @@ const PLAYER_COLOR_SHIP_SAILS_SPRITES: Record<PlayerColor, string> = {
 const SHIP_SELECTION_INDICATOR_COLOR = 0x203e8c;
 
 export {
+  DEBUG_FLOW_FIELD_GRID_ENABLED,
   MAP_WIDTH,
   MAP_HEIGHT,
   SHIP_DEFAULT_VELOCITY,
