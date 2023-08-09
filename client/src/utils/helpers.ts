@@ -6,14 +6,26 @@ function distanceBetweenPoints(p1: PIXI.Point, p2: PIXI.Point): number {
   return Math.hypot(a, b);
 }
 
-function interpolateFromOneRangeToAnother(
+function rangeLerp(
   value: number,
-  start1: number,
-  stop1: number,
-  start2: number,
-  stop2: number
+  min1: number,
+  max1: number,
+  min2: number,
+  max2: number
 ): number {
-  return start2 + (stop2 - start2) * ((value - start1) / (stop1 - start1));
+  return min2 + (max2 - min2) * ((value - min1) / (max1 - min1));
 }
 
-export { distanceBetweenPoints, interpolateFromOneRangeToAnother };
+function rgbToHex(r: number, g: number, b: number) {
+  r = Math.min(255, Math.max(0, r));
+  g = Math.min(255, Math.max(0, g));
+  b = Math.min(255, Math.max(0, b));
+
+  const hexR = r.toString(16).padStart(2, "0");
+  const hexG = g.toString(16).padStart(2, "0");
+  const hexB = b.toString(16).padStart(2, "0");
+
+  return `#${hexR}${hexG}${hexB}`;
+}
+
+export { distanceBetweenPoints, rangeLerp, rgbToHex };

@@ -10,9 +10,12 @@ class FlowField {
 
   constructor(private cellCountX: number, private cellCountY: number, private tileSize: number) {
     this.cells = Array.from({ length: this.cellCountX }, () => Array.from({ length: this.cellCountY }));
+  }
 
+  init() {
     for (let i = 0; i < this.cellCountX; i++) {
       this.cells[i] = [];
+
       for (let j = 0; j < this.cellCountY; j++) {
         const x = i * this.tileSize;
         const y = j * this.tileSize;

@@ -7,7 +7,7 @@ import {
   SHIP_TARGET_HALT_MIN_DISTANCE,
   SHIP_SELECTION_INDICATOR_COLOR,
 } from "../utils/constants";
-import { distanceBetweenPoints, interpolateFromOneRangeToAnother } from "../utils/helpers";
+import { distanceBetweenPoints, rangeLerp } from "../utils/helpers";
 import CameraState from "./camera-state";
 import GameObject from "../models/game-object";
 import PlayerColor from "../models/player-color";
@@ -100,7 +100,7 @@ class Ship implements GameObject {
     const { x, y } = this.hull;
     const circleBorder = 4 + 8 * Math.abs(CameraState.zoomLevel - 1);
     const circlePadding = 10;
-    const circleFillOpacity = interpolateFromOneRangeToAnother(CameraState.zoomLevel, 0.25, 1, 0.35, 0.05);
+    const circleFillOpacity = rangeLerp(CameraState.zoomLevel, 0.25, 1, 0.35, 0.05);
 
     this.selectionIndicator.clear();
     this.selectionIndicator.lineStyle(circleBorder, SHIP_SELECTION_INDICATOR_COLOR, 0.75);
