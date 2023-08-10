@@ -3,12 +3,17 @@ import * as PIXI from "pixi.js";
 import Cell from "../models/cell";
 import GridDirection from "../models/grid-direction";
 import Queue from "../utils/queue";
+import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
 
 class FlowField {
+  private cellCountX: number;
+  private cellCountY: number;
   cells: Cell[][];
   destination: Cell;
 
-  constructor(private cellCountX: number, private cellCountY: number, private tileSize: number) {
+  constructor() {
+    this.cellCountX = MAP_GRID_WIDTH;
+    this.cellCountY = MAP_GRID_HEIGHT;
     this.cells = Array.from({ length: this.cellCountX }, () => Array.from({ length: this.cellCountY }));
   }
 
@@ -17,8 +22,8 @@ class FlowField {
       this.cells[i] = [];
 
       for (let j = 0; j < this.cellCountY; j++) {
-        const x = i * this.tileSize;
-        const y = j * this.tileSize;
+        const x = i * MAP_GRID_CELL_SIZE;
+        const y = j * MAP_GRID_CELL_SIZE;
         this.cells[i][j] = {
           i,
           j,
@@ -29,14 +34,6 @@ class FlowField {
           isRoughSea: false,
           isObstacle: false,
         };
-
-        // TODO: Testing purposes
-        if (i > 20 && i < 25 && j > 10 && j < 20) {
-          this.cells[i][j].isRoughSea = true;
-        }
-        if (i > 10 && i < 15 && j > 2 && j < 6) {
-          this.cells[i][j].isObstacle = true;
-        }
       }
     }
   }
@@ -101,8 +98,8 @@ class FlowField {
   }
 
   getCellAtPosition(x: number, y: number): Cell {
-    const i = Math.floor(x / this.tileSize);
-    const j = Math.floor(y / this.tileSize);
+    const i = Math.floor(x / MAP_GRID_CELL_SIZE);
+    const j = Math.floor(y / MAP_GRID_CELL_SIZE);
     return this.cells[i][j];
   }
 

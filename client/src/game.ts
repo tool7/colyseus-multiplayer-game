@@ -1,7 +1,7 @@
 import * as PIXI from "pixi.js";
 import { Viewport } from "pixi-viewport";
 
-import { MAP_HEIGHT, MAP_WIDTH } from "./utils/constants";
+import { MAP_GRID_WIDTH, MAP_GRID_HEIGHT, MAP_GRID_CELL_SIZE } from "./utils/constants";
 import GameObject from "./models/game-object";
 import PlayerColor from "./models/player-color";
 import Ship from "./core/ship";
@@ -32,8 +32,8 @@ gameContainer.appendChild(app.view);
 const viewport = new Viewport({
   screenWidth: window.innerWidth,
   screenHeight: window.innerHeight,
-  worldWidth: MAP_WIDTH,
-  worldHeight: MAP_HEIGHT,
+  worldWidth: MAP_GRID_WIDTH * MAP_GRID_CELL_SIZE,
+  worldHeight: MAP_GRID_HEIGHT * MAP_GRID_CELL_SIZE,
   events: app.renderer.events,
 });
 app.stage.addChild(viewport);
@@ -45,7 +45,7 @@ viewport
   .animate({ ease: "linear", time: 1000 });
 
 viewport.fit();
-viewport.moveCenter(MAP_WIDTH / 2, MAP_HEIGHT / 2);
+viewport.moveCenter(viewport.worldWidth / 2, viewport.worldHeight / 2);
 CameraState.setZoomLevel(viewport.scaled);
 
 window.onload = () => {
@@ -57,7 +57,7 @@ window.onload = () => {
 
   viewport.on("rightclick", (e) => {
     const { x, y } = e.getLocalPosition(viewport);
-    if (x < 0 || x > MAP_WIDTH || y < 0 || y > MAP_HEIGHT) {
+    if (x < 0 || x > viewport.worldWidth || y < 0 || y > viewport.worldHeight) {
       return;
     }
 

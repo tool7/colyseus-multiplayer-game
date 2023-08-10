@@ -1,44 +1,29 @@
 import * as PIXI from "pixi.js";
-import { Tilemap } from "@pixi/tilemap";
 
-import seaTileBase64 from "../assets/sea_tile.png";
+import seaSpriteBase64 from "../assets/sea.png";
 import Cell from "../models/cell";
 import GameObject from "../models/game-object";
-import { MAP_HEIGHT, MAP_WIDTH } from "../utils/constants";
+import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
 import FlowField from "./flow-field";
 import { rangeLerp, rgbToHex } from "../utils/helpers";
 import DebugController from "../utils/debug-controller";
 
 class WorldMap implements GameObject {
+  private background: PIXI.Sprite;
   private flowField: FlowField;
-  private tileCountX: number;
-  private tileCountY: number;
-  private tileSize: number;
-  private tilemap: Tilemap;
   private debugFlowFieldGrid: PIXI.Graphics;
   private debugFlowFieldVectors: PIXI.Graphics;
   private debugFlowFieldTextContainer: PIXI.Container;
   private debugFlowFieldType: string;
 
   constructor(private world: PIXI.Container) {
-    // TODO: Fix issue with small tiles when importing Texture as path
-    // const seaTile = PIXI.Texture.from("dist/assets/sea_tile.png");
-    const seaTile = PIXI.Texture.from(seaTileBase64);
-    this.tileSize = 64;
-    this.tileCountX = Math.round(MAP_WIDTH / this.tileSize);
-    this.tileCountY = Math.round(MAP_HEIGHT / this.tileSize);
-    this.flowField = new FlowField(this.tileCountX, this.tileCountY, this.tileSize);
-    this.tilemap = new Tilemap([seaTile.baseTexture]);
+    const seaTexture = PIXI.Texture.from(seaSpriteBase64);
+    this.background = PIXI.Sprite.from(seaTexture);
+    this.background.width = MAP_GRID_WIDTH * MAP_GRID_CELL_SIZE;
+    this.background.height = MAP_GRID_HEIGHT * MAP_GRID_CELL_SIZE;
+    this.world.addChild(this.background);
 
-    this.world.addChild(this.tilemap);
-
-    for (let i = 0; i < this.tileCountX; i++) {
-      for (let j = 0; j < this.tileCountY; j++) {
-        const x = i * this.tileSize;
-        const y = j * this.tileSize;
-        this.tilemap.tile(seaTile, x, y);
-      }
-    }
+    this.flowField = new FlowField();
 
     this.debugFlowFieldGrid = new PIXI.Graphics();
     this.debugFlowFieldVectors = new PIXI.Graphics();
@@ -50,10 +35,10 @@ class WorldMap implements GameObject {
   }
 
   get displayObject() {
-    return this.tilemap;
+    return this.background;
   }
   get transform() {
-    return this.tilemap.transform;
+    return this.background.transform;
   }
   update(delta: number): void {}
 
@@ -83,12 +68,12 @@ class WorldMap implements GameObject {
     this.debugFlowFieldTextContainer.removeChildren();
     this.debugFlowFieldVectors.clear();
 
-    for (let i = 0; i < this.tileCountX; i++) {
-      for (let j = 0; j < this.tileCountY; j++) {
+    for (let i = 0; i < MAP_GRID_WIDTH; i++) {
+      for (let j = 0; j < MAP_GRID_HEIGHT; j++) {
         const { position, cost, bestCost, bestDirection } = cells[i][j];
         this.debugFlowFieldGrid.lineStyle(2, 0x000000, 0.3);
         this.debugFlowFieldGrid.beginFill(0x000000, 0);
-        this.debugFlowFieldGrid.drawRect(position.x, position.y, this.tileSize, this.tileSize);
+        this.debugFlowFieldGrid.drawRect(position.x, position.y, MAP_GRID_CELL_SIZE, MAP_GRID_CELL_SIZE);
         this.debugFlowFieldGrid.endFill();
 
         if (this.debugFlowFieldType === "cost" || this.debugFlowFieldType === "integration") {
@@ -99,13 +84,13 @@ class WorldMap implements GameObject {
           });
           const text = new PIXI.Text(this.debugFlowFieldType === "cost" ? cost : bestCost, textStyle);
           text.anchor.set(0.5, 0.5);
-          text.position.set(position.x + this.tileSize / 2, position.y + this.tileSize / 2);
+          text.position.set(position.x + MAP_GRID_CELL_SIZE / 2, position.y + MAP_GRID_CELL_SIZE / 2);
           this.debugFlowFieldTextContainer.addChild(text);
         }
 
         if (this.debugFlowFieldType === "flow") {
-          const arrowX = position.x + this.tileSize / 2;
-          const arrowY = position.y + this.tileSize / 2;
+          const arrowX = position.x + MAP_GRID_CELL_SIZE / 2;
+          const arrowY = position.y + MAP_GRID_CELL_SIZE / 2;
           this.debugFlowFieldVectors.moveTo(arrowX, arrowY);
           this.debugFlowFieldVectors.lineStyle(3, 0x000000, 0.5);
           this.debugFlowFieldVectors.beginFill(0x000000, 1);
