@@ -8,6 +8,7 @@ import Ship from "./core/ship";
 import CameraState from "./core/camera-state";
 import MouseAreaSelection from "./core/mouse-area-selection";
 import WorldMap from "./core/world-map";
+import DebugController from "./utils/debug-controller";
 
 const gameContainer = document.querySelector(".game") as HTMLDivElement;
 const gameObjects: Array<GameObject> = [];
@@ -19,6 +20,8 @@ const players = [
   { initialPosition: { x: 1000, y: 1600 }, initialRotation: Math.PI, color: PlayerColor.GREEN },
   { initialPosition: { x: 2000, y: 200 }, initialRotation: 1, color: PlayerColor.BLUE },
 ];
+
+DebugController.init();
 
 const app = new PIXI.Application<HTMLCanvasElement>({
   resizeTo: gameContainer,
