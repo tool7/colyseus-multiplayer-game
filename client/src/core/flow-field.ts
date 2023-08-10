@@ -93,12 +93,7 @@ class FlowField {
         neighborCells.forEach((neighbor) => {
           if (neighbor.bestCost < currentBestCost) {
             currentBestCost = neighbor.bestCost;
-
-            // TODO: Check if calculation is correct
-            currentCell.bestDirection.set(
-              neighbor.position.x - currentCell.position.x,
-              neighbor.position.y - currentCell.position.y
-            );
+            currentCell.bestDirection.set(neighbor.i - currentCell.i, neighbor.j - currentCell.j);
           }
         });
       }
