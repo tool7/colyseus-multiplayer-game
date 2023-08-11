@@ -2,6 +2,7 @@ import * as PIXI from "pixi.js";
 
 import Cell from "../models/cell";
 import GridDirection from "../models/grid-direction";
+import MapConfiguration from "../models/map-configuration";
 import Queue from "../utils/queue";
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
 
@@ -11,7 +12,7 @@ class FlowField {
   cells: Cell[][];
   destination: Cell;
 
-  constructor() {
+  constructor(private mapConfiguration: MapConfiguration) {
     this.cellCountX = MAP_GRID_WIDTH;
     this.cellCountY = MAP_GRID_HEIGHT;
     this.cells = Array.from({ length: this.cellCountX }, () => Array.from({ length: this.cellCountY }));
@@ -22,8 +23,11 @@ class FlowField {
       this.cells[i] = [];
 
       for (let j = 0; j < this.cellCountY; j++) {
-        const x = i * MAP_GRID_CELL_SIZE;
-        const y = j * MAP_GRID_CELL_SIZE;
+        const x = i * MAP_GRID_CELL_SIZE + MAP_GRID_CELL_SIZE / 2;
+        const y = j * MAP_GRID_CELL_SIZE + MAP_GRID_CELL_SIZE / 2;
+
+        const isObstacle = this.mapConfiguration.islands.some((island) => island.contains(x, y));
+
         this.cells[i][j] = {
           i,
           j,
@@ -31,8 +35,8 @@ class FlowField {
           cost: 1,
           bestCost: 255,
           bestDirection: new PIXI.Point(0, 0),
+          isObstacle,
           isRoughSea: false,
-          isObstacle: false,
         };
       }
     }

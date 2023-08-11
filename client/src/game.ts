@@ -9,17 +9,48 @@ import CameraState from "./core/camera-state";
 import MouseAreaSelection from "./core/mouse-area-selection";
 import WorldMap from "./core/world-map";
 import DebugController from "./utils/debug-controller";
+import MapConfiguration from "./models/map-configuration";
 
 const gameContainer = document.querySelector(".game") as HTMLDivElement;
 const gameObjects: Array<GameObject> = [];
 const mouseCoords = new PIXI.Point(0, 0);
 let selectedShips: Array<Ship> = [];
 
+// ===== WORLD CONFIG =====
 const players = [
   { initialPosition: { x: 200, y: 200 }, initialRotation: -1, color: PlayerColor.RED },
   { initialPosition: { x: 1000, y: 1600 }, initialRotation: Math.PI, color: PlayerColor.GREEN },
   { initialPosition: { x: 2000, y: 200 }, initialRotation: 1, color: PlayerColor.BLUE },
 ];
+const mapConfiguration: MapConfiguration = {
+  islands: [
+    new PIXI.Polygon([
+      { x: 600, y: 370 },
+      { x: 700, y: 260 },
+      { x: 780, y: 420 },
+      { x: 730, y: 570 },
+      { x: 590, y: 520 },
+    ]),
+    new PIXI.Polygon([
+      { x: 1600, y: 1370 },
+      { x: 1700, y: 1360 },
+      { x: 1780, y: 1420 },
+      { x: 1730, y: 1570 },
+      { x: 1590, y: 1520 },
+    ]),
+    new PIXI.Polygon([
+      { x: 1600, y: 500 },
+      { x: 1700, y: 600 },
+      { x: 1780, y: 700 },
+      { x: 1730, y: 800 },
+      { x: 1590, y: 900 },
+      { x: 1200, y: 800 },
+      { x: 1150, y: 600 },
+      { x: 1300, y: 500 },
+    ]),
+  ],
+};
+// ========================
 
 DebugController.init();
 
@@ -49,7 +80,7 @@ viewport.moveCenter(viewport.worldWidth / 2, viewport.worldHeight / 2);
 CameraState.setZoomLevel(viewport.scaled);
 
 window.onload = () => {
-  const worldMap = new WorldMap(viewport);
+  const worldMap = new WorldMap(viewport, mapConfiguration);
 
   viewport.on("zoomed", () => {
     CameraState.setZoomLevel(viewport.scaled);
