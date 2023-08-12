@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import _ from "lodash";
 
 import Cell from "../models/cell";
 import GridDirection from "../models/grid-direction";
@@ -9,8 +10,8 @@ import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/co
 class FlowField {
   private cellCountX: number;
   private cellCountY: number;
+  private destination: Cell;
   cells: Cell[][];
-  destination: Cell;
 
   constructor(private mapConfiguration: MapConfiguration) {
     this.cellCountX = MAP_GRID_WIDTH;
@@ -59,7 +60,6 @@ class FlowField {
   }
 
   createIntegrationField(destinationCell: Cell) {
-    // TODO: Is "this.destination" property needed?
     this.destination = destinationCell;
     this.destination.cost = 0;
     this.destination.bestCost = 0;
@@ -105,6 +105,14 @@ class FlowField {
     const i = Math.floor(x / MAP_GRID_CELL_SIZE);
     const j = Math.floor(y / MAP_GRID_CELL_SIZE);
     return this.cells[i][j];
+  }
+
+  getDestinationPosition(): PIXI.Point {
+    return this.destination.position;
+  }
+
+  clone(): FlowField {
+    return _.cloneDeep(this);
   }
 
   private increaseCellCost(cell: Cell, amount: number) {

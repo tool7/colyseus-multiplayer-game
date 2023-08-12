@@ -39,7 +39,7 @@ class WorldMap implements GameObject {
   }
   update(delta: number): void {}
 
-  initializeFlowFieldAt(x: number, y: number) {
+  getFlowFieldForPosition(x: number, y: number): FlowField {
     this.flowField.init();
 
     const destinationCell = this.flowField.getCellAtPosition(x, y);
@@ -48,6 +48,8 @@ class WorldMap implements GameObject {
     this.flowField.createFlowField();
 
     this.drawDebugFlowFieldGrid(this.flowField.cells);
+
+    return this.flowField.clone();
   }
 
   private drawMap() {

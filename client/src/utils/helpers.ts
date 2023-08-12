@@ -6,14 +6,12 @@ function distanceBetweenPoints(p1: PIXI.Point, p2: PIXI.Point): number {
   return Math.hypot(a, b);
 }
 
-function rangeLerp(
-  value: number,
-  min1: number,
-  max1: number,
-  min2: number,
-  max2: number
-): number {
+function rangeLerp(value: number, min1: number, max1: number, min2: number, max2: number): number {
   return min2 + (max2 - min2) * ((value - min1) / (max1 - min1));
+}
+
+function degreesToRadians(degrees: number) {
+  return degrees * (Math.PI / 180);
 }
 
 function rgbToHex(r: number, g: number, b: number) {
@@ -28,4 +26,4 @@ function rgbToHex(r: number, g: number, b: number) {
   return `#${hexR}${hexG}${hexB}`;
 }
 
-export { distanceBetweenPoints, rangeLerp, rgbToHex };
+export { distanceBetweenPoints, rangeLerp, degreesToRadians, rgbToHex };

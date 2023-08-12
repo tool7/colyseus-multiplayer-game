@@ -13,7 +13,6 @@ import MapConfiguration from "./models/map-configuration";
 
 const gameContainer = document.querySelector(".game") as HTMLDivElement;
 const gameObjects: Array<GameObject> = [];
-const mouseCoords = new PIXI.Point(0, 0);
 let selectedShips: Array<Ship> = [];
 
 // ===== WORLD CONFIG =====
@@ -92,15 +91,11 @@ window.onload = () => {
       return;
     }
 
-    mouseCoords.x = x;
-    mouseCoords.y = y;
+    const flowField = worldMap.getFlowFieldForPosition(x, y);
 
-    // TODO: Testing purposes
-    worldMap.initializeFlowFieldAt(x, y);
-
-    // selectedShips.forEach((ship) => {
-    //   ship.goTo(mouseCoords);
-    // });
+    selectedShips.forEach((ship) => {
+      ship.followFlowField(flowField);
+    });
   });
 
   players.forEach((player) => {
