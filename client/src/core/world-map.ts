@@ -66,8 +66,17 @@ class WorldMap implements GameObject {
       islandGaphics.endFill();
     });
 
+    const stormGraphics = new PIXI.Graphics();
+    this.mapConfiguration.storms.forEach((storm) => {
+      stormGraphics.lineStyle(0);
+      stormGraphics.beginFill(0x4c9ded, 1);
+      stormGraphics.drawPolygon(storm);
+      stormGraphics.endFill();
+    });
+
     this.world.addChild(background);
     this.world.addChild(islandGaphics);
+    this.world.addChild(stormGraphics);
   }
 
   private drawDebugFlowFieldGrid(cells: Cell[][]) {

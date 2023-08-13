@@ -27,8 +27,6 @@ class FlowField {
         const x = i * MAP_GRID_CELL_SIZE + MAP_GRID_CELL_SIZE / 2;
         const y = j * MAP_GRID_CELL_SIZE + MAP_GRID_CELL_SIZE / 2;
 
-        const isObstacle = this.mapConfiguration.islands.some((island) => island.contains(x, y));
-
         this.cells[i][j] = {
           i,
           j,
@@ -36,8 +34,6 @@ class FlowField {
           cost: 1,
           bestCost: 255,
           bestDirection: new PIXI.Point(0, 0),
-          isObstacle,
-          isRoughSea: false,
         };
       }
     }
@@ -48,11 +44,18 @@ class FlowField {
       for (let j = 0; j < this.cellCountY; j++) {
         const cell = this.cells[i][j];
 
-        if (cell.isObstacle) {
+        const isIslandCell = this.mapConfiguration.islands.some((islandPolygon) =>
+          islandPolygon.contains(cell.position.x, cell.position.y)
+        );
+        const isStormCell = this.mapConfiguration.storms.some((stormPolygon) =>
+          stormPolygon.contains(cell.position.x, cell.position.y)
+        );
+
+        if (isIslandCell) {
           this.increaseCellCost(cell, 255);
           continue;
         }
-        if (cell.isRoughSea) {
+        if (isStormCell) {
           this.increaseCellCost(cell, 3);
         }
       }
