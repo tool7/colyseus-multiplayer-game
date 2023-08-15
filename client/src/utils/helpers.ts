@@ -14,6 +14,16 @@ function degreesToRadians(degrees: number) {
   return degrees * (Math.PI / 180);
 }
 
+function normalizeAngle(angle: number): number {
+  while (angle > Math.PI) {
+    angle -= 2 * Math.PI;
+  }
+  while (angle < -Math.PI) {
+    angle += 2 * Math.PI;
+  }
+  return angle;
+}
+
 function rgbToHex(r: number, g: number, b: number) {
   r = Math.min(255, Math.max(0, r));
   g = Math.min(255, Math.max(0, g));
@@ -26,4 +36,4 @@ function rgbToHex(r: number, g: number, b: number) {
   return `#${hexR}${hexG}${hexB}`;
 }
 
-export { distanceBetweenPoints, rangeLerp, degreesToRadians, rgbToHex };
+export { distanceBetweenPoints, rangeLerp, degreesToRadians, normalizeAngle, rgbToHex };

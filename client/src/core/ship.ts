@@ -7,8 +7,9 @@ import {
   SHIP_HEIGHT,
   SHIP_SELECTION_INDICATOR_COLOR,
   SHIP_WIDTH,
+  SHIP_TURN_SPEED,
 } from "../utils/constants";
-import { degreesToRadians, distanceBetweenPoints, rangeLerp } from "../utils/helpers";
+import { distanceBetweenPoints, normalizeAngle, rangeLerp } from "../utils/helpers";
 import CameraState from "./camera-state";
 import GameObject from "../models/game-object";
 import PlayerColor from "../models/player-color";
@@ -17,10 +18,11 @@ import FlowField from "./flow-field";
 class Ship implements GameObject {
   private container: PIXI.Container;
   private sprite: PIXI.Sprite;
-  private velocity: PIXI.Point;
+  private velocity: number;
   private destination: PIXI.Point;
   private flowField: FlowField;
   private isMoving: boolean;
+  private isDestinationReached: boolean;
   private selectionIndicator: PIXI.Graphics;
 
   constructor(playerColor: PlayerColor) {
@@ -40,7 +42,9 @@ class Ship implements GameObject {
     this.container.addChild(this.selectionIndicator);
     this.container.eventMode = "static";
 
-    this.velocity = new PIXI.Point(0, 0);
+    this.velocity = 0;
+    this.isMoving = false;
+    this.isDestinationReached = false;
   }
 
   get displayObject() {
@@ -62,38 +66,55 @@ class Ship implements GameObject {
   followFlowField(flowField: FlowField): void {
     this.flowField = flowField;
     this.destination = this.flowField.getDestinationPosition();
+    this.isDestinationReached = false;
     this.isMoving = true;
   }
 
   update(delta: number): void {
-    if (this.isMoving) {
-      // TODO: Improve stopping logic
-      const distance = distanceBetweenPoints(this.container.position, this.destination);
-      if (distance <= MAP_GRID_CELL_SIZE) {
-        this.velocity = new PIXI.Point(0, 0);
-        this.isMoving = false;
-      }
+    this.drawSelectionIndicator();
 
-      const cell = this.flowField.getCellAtPosition(this.container.x, this.container.y);
-
-      // TODO: Probably shouldn't modify velocity directly like this
-      if (this.velocity.x < SHIP_MAX_VELOCITY) {
-        this.velocity.x += 0.01;
-      }
-      if (this.velocity.y < SHIP_MAX_VELOCITY) {
-        this.velocity.y += 0.01;
-      }
-
-      const offsetX = cell.bestDirection.x * this.velocity.x * delta;
-      const offsetY = cell.bestDirection.y * this.velocity.y * delta;
-      const angle = Math.atan2(offsetY, offsetX);
-
-      this.container.rotation = angle - degreesToRadians(90);
-      this.container.x += offsetX;
-      this.container.y += offsetY;
+    if (!this.isMoving) {
+      return;
     }
 
-    this.drawSelectionIndicator();
+    if (this.isDestinationReached) {
+      this.velocity -= 0.01;
+
+      if (Math.abs(this.velocity) < 0.01) {
+        this.velocity = 0;
+        this.isMoving = false;
+      }
+    } else {
+      const distance = distanceBetweenPoints(this.container.position, this.destination);
+      this.isDestinationReached = distance <= MAP_GRID_CELL_SIZE;
+
+      // Gradually accelerating the ship up to the maximum velocity
+      if (this.velocity < SHIP_MAX_VELOCITY) {
+        this.velocity += 0.01;
+      }
+
+      // Calculating the desired angle based on the flow field's direction
+      const { bestDirection } = this.flowField.getCellAtPosition(this.container.x, this.container.y);
+      const desiredAngle = Math.atan2(bestDirection.y, bestDirection.x);
+
+      // Gradually adjusting the ship's rotation to the desired angle
+      const angleDifference = normalizeAngle(desiredAngle - this.container.rotation);
+      const rotationSpeed = SHIP_TURN_SPEED * delta;
+      if (Math.abs(angleDifference) > rotationSpeed) {
+        const rotationDirection = angleDifference > 0 ? 1 : -1;
+        this.container.rotation += rotationSpeed * rotationDirection;
+      } else {
+        this.container.rotation = desiredAngle;
+      }
+    }
+
+    // Calculating forward vector of the ship based on its rotation
+    const forwardX = Math.cos(this.container.rotation);
+    const forwardY = Math.sin(this.container.rotation);
+
+    // Moving the ship in its forward vector direction
+    this.container.x += forwardX * this.velocity * delta;
+    this.container.y += forwardY * this.velocity * delta;
   }
 
   private drawSelectionIndicator() {
@@ -109,7 +130,7 @@ class Ship implements GameObject {
     this.selectionIndicator.clear();
     this.selectionIndicator.lineStyle(circleBorder, SHIP_SELECTION_INDICATOR_COLOR, 0.75);
     this.selectionIndicator.beginFill(SHIP_SELECTION_INDICATOR_COLOR, circleFillOpacity);
-    this.selectionIndicator.drawCircle(x, y, this.displayObject.height / 2 + circlePadding);
+    this.selectionIndicator.drawCircle(x, y, this.displayObject.width / 2 + circlePadding);
     this.selectionIndicator.endFill();
   }
 }
