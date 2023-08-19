@@ -63,8 +63,6 @@ class MouseAreaSelection implements GameObject {
   get transform() {
     return this.selectedAreaGraphics.transform;
   }
-
-  update(delta: number): void {}
 }
 
 export default MouseAreaSelection;

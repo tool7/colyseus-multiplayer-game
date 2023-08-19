@@ -6,14 +6,13 @@ import GameObject from "./models/game-object";
 import PlayerColor from "./models/player-color";
 import Ship from "./core/ship";
 import CameraState from "./core/camera-state";
-import MouseAreaSelection from "./core/mouse-area-selection";
 import WorldMap from "./core/world-map";
+import ShipController from "./core/ship-controller";
 import DebugController from "./utils/debug-controller";
 import MapConfiguration from "./models/map-configuration";
 
 const gameContainer = document.querySelector(".game") as HTMLDivElement;
-const gameObjects: Array<GameObject> = [];
-let selectedShips: Array<Ship> = [];
+const gameObjects: GameObject[] = [];
 
 // ===== WORLD CONFIG =====
 const players = [
@@ -89,27 +88,17 @@ viewport
 
 viewport.fit();
 viewport.moveCenter(viewport.worldWidth / 2, viewport.worldHeight / 2);
+viewport.on("zoomed", () => {
+  CameraState.setZoomLevel(viewport.scaled);
+});
+
 CameraState.setZoomLevel(viewport.scaled);
 
 window.onload = () => {
-  const worldMap = new WorldMap(viewport, mapConfiguration);
+  const worldMap = new WorldMap(mapConfiguration);
+  viewport.addChild(worldMap.displayObject);
 
-  viewport.on("zoomed", () => {
-    CameraState.setZoomLevel(viewport.scaled);
-  });
-
-  viewport.on("rightclick", (e) => {
-    const { x, y } = e.getLocalPosition(viewport);
-    if (x < 0 || x > viewport.worldWidth || y < 0 || y > viewport.worldHeight) {
-      return;
-    }
-
-    const flowField = worldMap.getFlowFieldForPosition(x, y);
-
-    selectedShips.forEach((ship) => {
-      ship.followFlowField(flowField);
-    });
-  });
+  const playerShips: Ship[] = [];
 
   players.forEach((player) => {
     const ship = new Ship(player.color);
@@ -119,32 +108,20 @@ window.onload = () => {
     transform.rotation = player.initialRotation;
     ship.transform = transform;
 
-    ship.displayObject.on("click", () => {
-      selectedShips.forEach((ship) => ship.setSelected(false));
-      ship.setSelected(true);
-      selectedShips = [ship];
-    });
-
+    playerShips.push(ship);
     gameObjects.push(ship);
     viewport.addChild(ship.displayObject);
   });
 
-  const mouseAreaSelection = new MouseAreaSelection(viewport);
-  app.stage.addChild(mouseAreaSelection.displayObject);
-
-  mouseAreaSelection.selectionEvent.on("select", (area: PIXI.Rectangle) => {
-    selectedShips.forEach((ship) => ship.setSelected(false));
-    selectedShips = (gameObjects as Array<Ship>).filter((ship) => {
-      const global = ship.displayObject.toGlobal(worldMap.displayObject.position);
-      return area.contains(global.x, global.y);
-    });
-    selectedShips.forEach((ship) => ship.setSelected(true));
+  const shipController = new ShipController(viewport, mapConfiguration, playerShips);
+  shipController.getDisplayObjects().forEach((displayObject) => {
+    app.stage.addChild(displayObject);
   });
 };
 
 app.ticker.add((delta) => {
   for (const gameObject of gameObjects) {
-    gameObject.update(delta);
+    gameObject.update?.(delta);
   }
 });
 

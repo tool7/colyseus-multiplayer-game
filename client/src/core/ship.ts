@@ -16,11 +16,12 @@ import PlayerColor from "../models/player-color";
 import FlowField from "./flow-field";
 
 class Ship implements GameObject {
+  flowField: FlowField;
+
   private container: PIXI.Container;
   private sprite: PIXI.Sprite;
   private velocity: number;
   private destination: PIXI.Point;
-  private flowField: FlowField;
   private isMoving: boolean;
   private isDestinationReached: boolean;
   private selectionIndicator: PIXI.Graphics;
