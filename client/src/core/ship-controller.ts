@@ -5,9 +5,8 @@ import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/co
 import { rangeLerp, rgbToHex } from "../utils/helpers";
 import DebugController from "../utils/debug-controller";
 import MapConfiguration from "../models/map-configuration";
-import Cell from "../models/cell";
 import Ship from "./ship";
-import FlowField from "./flow-field";
+import FlowFieldGenerator from "./flow-field-generator";
 import MouseAreaSelection from "./mouse-area-selection";
 
 class ShipController {
@@ -49,13 +48,7 @@ class ShipController {
         return;
       }
 
-      const flowField = this.getFlowFieldForPosition(x, y);
-
-      // TODO: Create flow field for each of the ships, with slightly different destinations
-      this.selectedShips.forEach((ship) => {
-        ship.followFlowField(flowField);
-      });
-
+      this.startShipsMovementToTarget(x, y);
       this.drawDebugFlowFieldGrid();
     });
 
@@ -72,16 +65,17 @@ class ShipController {
     return [this.mouseAreaSelection.displayObject];
   }
 
-  private getFlowFieldForPosition(x: number, y: number): FlowField {
-    const flowField = new FlowField(this.mapConfiguration);
-    flowField.init();
+  private startShipsMovementToTarget(x: number, y: number) {
+    if (this.selectedShips.length === 0) {
+      return;
+    }
 
-    const destinationCell = flowField.getCellAtPosition(x, y);
-    flowField.createCostField();
-    flowField.createIntegrationField(destinationCell);
-    flowField.createFlowField();
+    const flowFieldGenerator = new FlowFieldGenerator(this.mapConfiguration);
+    const flowFields = flowFieldGenerator.generateMultipleFlowFields(x, y, this.selectedShips.length, 1);
 
-    return flowField.clone();
+    this.selectedShips.forEach((ship, i) => {
+      ship.followFlowField(flowFields[i]);
+    });
   }
 
   private drawDebugFlowFieldGrid() {

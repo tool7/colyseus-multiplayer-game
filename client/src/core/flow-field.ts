@@ -1,5 +1,4 @@
 import * as PIXI from "pixi.js";
-import _ from "lodash";
 
 import Cell from "../models/cell";
 import GridDirection from "../models/grid-direction";
@@ -13,13 +12,11 @@ class FlowField {
   private destination: Cell;
   cells: Cell[][];
 
-  constructor(private mapConfiguration: MapConfiguration) {
+  constructor(private mapConfiguration: MapConfiguration, destinationCellI: number, destinationCellJ: number) {
     this.cellCountX = MAP_GRID_WIDTH;
     this.cellCountY = MAP_GRID_HEIGHT;
     this.cells = Array.from({ length: this.cellCountX }, () => Array.from({ length: this.cellCountY }));
-  }
 
-  init() {
     for (let i = 0; i < this.cellCountX; i++) {
       this.cells[i] = [];
 
@@ -37,9 +34,25 @@ class FlowField {
         };
       }
     }
+
+    this.destination = this.cells[destinationCellI][destinationCellJ];
+
+    this.createCostField();
+    this.createIntegrationField();
+    this.createVectorField();
   }
 
-  createCostField() {
+  getCellAtPosition(x: number, y: number): Cell {
+    const i = Math.floor(x / MAP_GRID_CELL_SIZE);
+    const j = Math.floor(y / MAP_GRID_CELL_SIZE);
+    return this.cells[i][j];
+  }
+
+  getDestinationPosition(): PIXI.Point {
+    return this.destination.position;
+  }
+
+  private createCostField() {
     for (let i = 0; i < this.cellCountX; i++) {
       for (let j = 0; j < this.cellCountY; j++) {
         const cell = this.cells[i][j];
@@ -62,8 +75,7 @@ class FlowField {
     }
   }
 
-  createIntegrationField(destinationCell: Cell) {
-    this.destination = destinationCell;
+  private createIntegrationField() {
     this.destination.cost = 0;
     this.destination.bestCost = 0;
 
@@ -86,7 +98,7 @@ class FlowField {
     }
   }
 
-  createFlowField() {
+  private createVectorField() {
     for (let i = 0; i < this.cellCountX; i++) {
       for (let j = 0; j < this.cellCountY; j++) {
         const currentCell = this.cells[i][j];
@@ -102,20 +114,6 @@ class FlowField {
         });
       }
     }
-  }
-
-  getCellAtPosition(x: number, y: number): Cell {
-    const i = Math.floor(x / MAP_GRID_CELL_SIZE);
-    const j = Math.floor(y / MAP_GRID_CELL_SIZE);
-    return this.cells[i][j];
-  }
-
-  getDestinationPosition(): PIXI.Point {
-    return this.destination.position;
-  }
-
-  clone(): FlowField {
-    return _.cloneDeep(this);
   }
 
   private increaseCellCost(cell: Cell, amount: number) {
