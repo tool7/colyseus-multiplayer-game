@@ -9,8 +9,16 @@ import {
   SHIP_SELECTION_INDICATOR_COLOR,
   SHIP_WIDTH,
   SHIP_TURN_SPEED,
+  SHIP_NEIGHBORHOOD_RADIUS,
+  SHIP_REPULSION_FORCE,
 } from "../utils/constants";
-import { distanceBetweenPoints, normalizeAngle, rangeLerp } from "../utils/helpers";
+import {
+  distanceBetweenPoints,
+  getVectorBetweenPoints,
+  normalizeAngle,
+  normalizeVector,
+  rangeLerp,
+} from "../utils/helpers";
 import CameraState from "./camera-state";
 import GameObject from "../models/game-object";
 import PlayerColor from "../models/player-color";
@@ -27,6 +35,7 @@ class Ship implements GameObject {
   private isMoving: boolean;
   private isDestinationReached: boolean;
   private selectionIndicator: PIXI.Graphics;
+  private otherShips: Ship[];
 
   constructor(playerColor: PlayerColor) {
     this.id = nanoid();
@@ -61,6 +70,10 @@ class Ship implements GameObject {
   set transform(t: PIXI.Transform) {
     this.container.transform.position.set(t.position.x, t.position.y);
     this.container.transform.rotation = t.rotation;
+  }
+
+  setOtherShips(ships: Ship[]): void {
+    this.otherShips = ships;
   }
 
   setSelected(isSelected: boolean) {
@@ -113,13 +126,32 @@ class Ship implements GameObject {
       }
     }
 
+    // Collision avoidance
+    const repulsionVector = this.getNeighborShipsRepulsionVector();
+
     // Calculating forward vector of the ship based on its rotation
-    const forwardX = Math.cos(this.container.rotation);
-    const forwardY = Math.sin(this.container.rotation);
+    const forwardX = Math.cos(this.container.rotation) + repulsionVector.x;
+    const forwardY = Math.sin(this.container.rotation) + repulsionVector.y;
 
     // Moving the ship in its forward vector direction
     this.container.x += forwardX * this.velocity * delta;
     this.container.y += forwardY * this.velocity * delta;
+  }
+
+  private getNeighborShipsRepulsionVector(): PIXI.Point {
+    const neighborShips = this.otherShips.filter((ship) => {
+      const distance = distanceBetweenPoints(this.transform.position, ship.transform.position);
+      return distance < SHIP_NEIGHBORHOOD_RADIUS;
+    });
+
+    return neighborShips.reduce((sum, ship) => {
+      const distanceToNeighborShip = distanceBetweenPoints(this.transform.position, ship.transform.position);
+      const vectorFromNeighborShip = getVectorBetweenPoints(ship.transform.position, this.transform.position);
+      const normalizedVector = normalizeVector(vectorFromNeighborShip);
+      sum.x += (normalizedVector.x / distanceToNeighborShip) * SHIP_REPULSION_FORCE;
+      sum.y += (normalizedVector.y / distanceToNeighborShip) * SHIP_REPULSION_FORCE;
+      return sum;
+    }, new PIXI.Point(0, 0));
   }
 
   private drawSelectionIndicator() {

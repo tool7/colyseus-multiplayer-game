@@ -6,12 +6,25 @@ function distanceBetweenPoints(p1: PIXI.Point, p2: PIXI.Point): number {
   return Math.hypot(a, b);
 }
 
+function getVectorBetweenPoints(from: PIXI.Point, to: PIXI.Point): PIXI.Point {
+  return new PIXI.Point(to.x - from.x, to.y - from.y);
+}
+
+function getVectorMagnitude(vector: PIXI.Point): number {
+  return Math.sqrt(vector.x ** 2 + vector.y ** 2);
+}
+
 function rangeLerp(value: number, min1: number, max1: number, min2: number, max2: number): number {
   return min2 + (max2 - min2) * ((value - min1) / (max1 - min1));
 }
 
 function degreesToRadians(degrees: number) {
   return degrees * (Math.PI / 180);
+}
+
+function normalizeVector(vector: PIXI.Point): PIXI.Point {
+  const magnitude = getVectorMagnitude(vector);
+  return new PIXI.Point(vector.x / magnitude, vector.y / magnitude);
 }
 
 function normalizeAngle(angle: number): number {
@@ -36,4 +49,13 @@ function rgbToHex(r: number, g: number, b: number) {
   return `#${hexR}${hexG}${hexB}`;
 }
 
-export { distanceBetweenPoints, rangeLerp, degreesToRadians, normalizeAngle, rgbToHex };
+export {
+  distanceBetweenPoints,
+  getVectorBetweenPoints,
+  getVectorMagnitude,
+  rangeLerp,
+  degreesToRadians,
+  normalizeVector,
+  normalizeAngle,
+  rgbToHex,
+};

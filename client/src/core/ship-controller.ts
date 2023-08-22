@@ -22,6 +22,9 @@ class ShipController {
     this.mouseAreaSelection = new MouseAreaSelection(viewport);
 
     playerShips.forEach((ship) => {
+      const otherShips = playerShips.filter((s) => s.id !== ship.id);
+      ship.setOtherShips(otherShips);
+
       ship.displayObject.on("click", () => {
         this.selectedShips.forEach((ship) => ship.setSelected(false));
         ship.setSelected(true);
