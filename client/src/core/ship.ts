@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import { nanoid } from "nanoid";
 
 import {
   MAP_GRID_CELL_SIZE,
@@ -16,6 +17,7 @@ import PlayerColor from "../models/player-color";
 import FlowField from "./flow-field";
 
 class Ship implements GameObject {
+  id: string;
   flowField: FlowField;
 
   private container: PIXI.Container;
@@ -27,6 +29,8 @@ class Ship implements GameObject {
   private selectionIndicator: PIXI.Graphics;
 
   constructor(playerColor: PlayerColor) {
+    this.id = nanoid();
+
     // TODO: Fix container position?
     this.container = new PIXI.Container();
     this.selectionIndicator = new PIXI.Graphics();

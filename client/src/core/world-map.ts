@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import { nanoid } from "nanoid";
 
 import seaSpriteBase64 from "../assets/sea.png";
 import GameObject from "../models/game-object";
@@ -6,9 +7,13 @@ import MapConfiguration from "../models/map-configuration";
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
 
 class WorldMap implements GameObject {
+  id: string;
+
   private container: PIXI.Container;
 
   constructor(private mapConfiguration: MapConfiguration) {
+    this.id = nanoid();
+
     this.container = new PIXI.Container();
     this.drawMap();
   }

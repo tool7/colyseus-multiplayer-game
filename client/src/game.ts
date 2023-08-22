@@ -16,9 +16,9 @@ const gameObjects: GameObject[] = [];
 
 // ===== WORLD CONFIG =====
 const players = [
-  { initialPosition: { x: 200, y: 200 }, initialRotation: -1, color: PlayerColor.RED },
+  { initialPosition: { x: 1400, y: 200 }, initialRotation: -1, color: PlayerColor.RED },
   { initialPosition: { x: 1300, y: 1700 }, initialRotation: Math.PI, color: PlayerColor.GREEN },
-  { initialPosition: { x: 2000, y: 200 }, initialRotation: 1, color: PlayerColor.BLUE },
+  { initialPosition: { x: 1800, y: 200 }, initialRotation: 1, color: PlayerColor.BLUE },
 ];
 const mapConfiguration: MapConfiguration = {
   islands: [
