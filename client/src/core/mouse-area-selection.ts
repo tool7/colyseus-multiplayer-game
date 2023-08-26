@@ -1,11 +1,8 @@
 import * as PIXI from "pixi.js";
-import { nanoid } from "nanoid";
 
 import GameObject from "../models/game-object";
 
-class MouseAreaSelection implements GameObject {
-  id: string;
-
+class MouseAreaSelection extends GameObject {
   private selectedAreaStartPosition: PIXI.Point;
   private selectedAreaRectangle: PIXI.Rectangle;
   private selectedAreaGraphics: PIXI.Graphics;
@@ -13,7 +10,7 @@ class MouseAreaSelection implements GameObject {
   selectionEvent: PIXI.utils.EventEmitter;
 
   constructor(private world: PIXI.DisplayObject) {
-    this.id = nanoid();
+    super();
 
     this.selectedAreaStartPosition = new PIXI.Point();
     this.selectedAreaRectangle = new PIXI.Rectangle();
@@ -62,12 +59,13 @@ class MouseAreaSelection implements GameObject {
     });
   }
 
-  get displayObject() {
+  get renderObject() {
     return this.selectedAreaGraphics;
   }
   get transform() {
     return this.selectedAreaGraphics.transform;
   }
+  update() {}
 }
 
 export default MouseAreaSelection;

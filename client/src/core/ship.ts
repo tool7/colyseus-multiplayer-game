@@ -1,5 +1,4 @@
 import * as PIXI from "pixi.js";
-import { nanoid } from "nanoid";
 
 import {
   MAP_GRID_CELL_SIZE,
@@ -24,8 +23,7 @@ import GameObject from "../models/game-object";
 import PlayerColor from "../models/player-color";
 import FlowField from "./flow-field";
 
-class Ship implements GameObject {
-  id: string;
+class Ship extends GameObject {
   flowField: FlowField;
 
   private container: PIXI.Container;
@@ -38,7 +36,7 @@ class Ship implements GameObject {
   private otherShips: Ship[];
 
   constructor(playerColor: PlayerColor) {
-    this.id = nanoid();
+    super();
 
     // TODO: Fix container position?
     this.container = new PIXI.Container();
@@ -61,7 +59,7 @@ class Ship implements GameObject {
     this.isDestinationReached = false;
   }
 
-  get displayObject() {
+  get renderObject() {
     return this.container;
   }
   get transform() {
@@ -167,7 +165,7 @@ class Ship implements GameObject {
     this.selectionIndicator.clear();
     this.selectionIndicator.lineStyle(circleBorder, SHIP_SELECTION_INDICATOR_COLOR, 0.75);
     this.selectionIndicator.beginFill(SHIP_SELECTION_INDICATOR_COLOR, circleFillOpacity);
-    this.selectionIndicator.drawCircle(x, y, this.displayObject.width / 2 + circlePadding);
+    this.selectionIndicator.drawCircle(x, y, this.container.width / 2 + circlePadding);
     this.selectionIndicator.endFill();
   }
 }

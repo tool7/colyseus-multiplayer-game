@@ -96,7 +96,7 @@ CameraState.setZoomLevel(viewport.scaled);
 
 window.onload = () => {
   const worldMap = new WorldMap(mapConfiguration);
-  viewport.addChild(worldMap.displayObject);
+  viewport.addChild(worldMap.renderObject);
 
   const playerShips: Ship[] = [];
 
@@ -110,12 +110,12 @@ window.onload = () => {
 
     playerShips.push(ship);
     gameObjects.push(ship);
-    viewport.addChild(ship.displayObject);
+    viewport.addChild(ship.renderObject);
   });
 
   const shipController = new ShipController(viewport, mapConfiguration, playerShips);
-  shipController.getDisplayObjects().forEach((displayObject) => {
-    app.stage.addChild(displayObject);
+  shipController.getRenderObjects().forEach((renderObject) => {
+    app.stage.addChild(renderObject);
   });
 };
 

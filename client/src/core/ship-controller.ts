@@ -25,7 +25,7 @@ class ShipController {
       const otherShips = playerShips.filter((s) => s.id !== ship.id);
       ship.setOtherShips(otherShips);
 
-      ship.displayObject.on("click", () => {
+      ship.renderObject.on("click", () => {
         this.selectedShips.forEach((ship) => ship.setSelected(false));
         ship.setSelected(true);
         this.selectedShips = [ship];
@@ -37,7 +37,7 @@ class ShipController {
     this.mouseAreaSelection.selectionEvent.on("select", (area: PIXI.Rectangle) => {
       this.selectedShips.forEach((ship) => ship.setSelected(false));
       this.selectedShips = this.playerShips.filter((ship) => {
-        const global = ship.displayObject.toGlobal(new PIXI.Point(0, 0));
+        const global = ship.renderObject.toGlobal(new PIXI.Point(0, 0));
         return area.contains(global.x, global.y);
       });
       this.selectedShips.forEach((ship) => ship.setSelected(true));
@@ -64,8 +64,9 @@ class ShipController {
     });
   }
 
-  getDisplayObjects(): PIXI.DisplayObject[] {
-    return [this.mouseAreaSelection.displayObject];
+  // TODO: Need a better way of handling this
+  getRenderObjects(): PIXI.DisplayObject[] {
+    return [this.mouseAreaSelection.renderObject];
   }
 
   private startShipsMovementToTarget(x: number, y: number) {

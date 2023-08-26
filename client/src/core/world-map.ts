@@ -1,29 +1,27 @@
 import * as PIXI from "pixi.js";
-import { nanoid } from "nanoid";
 
 import seaSpriteBase64 from "../assets/sea.png";
 import GameObject from "../models/game-object";
 import MapConfiguration from "../models/map-configuration";
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
 
-class WorldMap implements GameObject {
-  id: string;
-
+class WorldMap extends GameObject {
   private container: PIXI.Container;
 
   constructor(private mapConfiguration: MapConfiguration) {
-    this.id = nanoid();
+    super();
 
     this.container = new PIXI.Container();
     this.drawMap();
   }
 
-  get displayObject() {
+  get renderObject() {
     return this.container;
   }
   get transform() {
     return this.container.transform;
   }
+  update() {}
 
   private drawMap() {
     const seaTexture = PIXI.Texture.from(seaSpriteBase64);
