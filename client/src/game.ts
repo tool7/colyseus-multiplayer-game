@@ -3,65 +3,16 @@ import { Viewport } from "pixi-viewport";
 
 import { MAP_GRID_WIDTH, MAP_GRID_HEIGHT, MAP_GRID_CELL_SIZE } from "./utils/constants";
 import GameObject from "./models/game-object";
-import PlayerColor from "./models/player-color";
 import Ship from "./core/ship";
 import CameraState from "./core/camera-state";
 import WorldMap from "./core/world-map";
 import ShipController from "./core/ship-controller";
 import DebugController from "./utils/debug-controller";
-import MapConfiguration from "./models/map-configuration";
+import WORLDS from "./data/worlds";
 
 const gameContainer = document.querySelector(".game") as HTMLDivElement;
 const gameObjects: GameObject[] = [];
-
-// ===== WORLD CONFIG =====
-const players = [
-  { initialPosition: { x: 1400, y: 200 }, initialRotation: -1, color: PlayerColor.RED },
-  { initialPosition: { x: 1300, y: 1700 }, initialRotation: Math.PI, color: PlayerColor.GREEN },
-  { initialPosition: { x: 1800, y: 200 }, initialRotation: 1, color: PlayerColor.BLUE },
-];
-const mapConfiguration: MapConfiguration = {
-  islands: [
-    new PIXI.Polygon([
-      { x: 600, y: 370 },
-      { x: 700, y: 260 },
-      { x: 780, y: 420 },
-      { x: 730, y: 570 },
-      { x: 590, y: 520 },
-    ]),
-    new PIXI.Polygon([
-      { x: 1600, y: 1370 },
-      { x: 1700, y: 1360 },
-      { x: 1780, y: 1420 },
-      { x: 1730, y: 1570 },
-      { x: 1590, y: 1520 },
-    ]),
-    new PIXI.Polygon([
-      { x: 1600, y: 500 },
-      { x: 1700, y: 600 },
-      { x: 1780, y: 700 },
-      { x: 1730, y: 800 },
-      { x: 1590, y: 900 },
-      { x: 1200, y: 800 },
-      { x: 1150, y: 600 },
-      { x: 1300, y: 500 },
-    ]),
-  ],
-  storms: [
-    new PIXI.Polygon([
-      { x: 1000, y: 1100 },
-      { x: 1100, y: 1200 },
-      { x: 1180, y: 1300 },
-      { x: 1130, y: 1400 },
-      { x: 990, y: 1550 },
-      { x: 750, y: 1600 },
-      { x: 600, y: 1400 },
-      { x: 550, y: 1200 },
-      { x: 800, y: 1050 },
-    ]),
-  ],
-};
-// ========================
+const worldConfig = WORLDS.DUMMY;
 
 DebugController.init();
 
@@ -70,6 +21,9 @@ const app = new PIXI.Application<HTMLCanvasElement>({
   resolution: window.devicePixelRatio,
 });
 gameContainer.appendChild(app.view);
+
+// Enabling "PixiJS Devtools" browser extension
+globalThis.__PIXI_APP__ = app;
 
 const viewport = new Viewport({
   screenWidth: window.innerWidth,
@@ -95,12 +49,12 @@ viewport.on("zoomed", () => {
 CameraState.setZoomLevel(viewport.scaled);
 
 window.onload = () => {
-  const worldMap = new WorldMap(mapConfiguration);
+  const worldMap = new WorldMap(worldConfig);
   viewport.addChild(worldMap.renderObject);
 
   const playerShips: Ship[] = [];
 
-  players.forEach((player) => {
+  worldConfig.playerSetup.forEach((player) => {
     const ship = new Ship(player.color);
     const { x, y } = player.initialPosition;
     const transform = new PIXI.Transform();
@@ -113,7 +67,7 @@ window.onload = () => {
     viewport.addChild(ship.renderObject);
   });
 
-  const shipController = new ShipController(viewport, mapConfiguration, playerShips);
+  const shipController = new ShipController(viewport, worldConfig, playerShips);
   shipController.getRenderObjects().forEach((renderObject) => {
     app.stage.addChild(renderObject);
   });

@@ -2,7 +2,7 @@ import * as PIXI from "pixi.js";
 
 import Cell from "../models/cell";
 import GridDirection from "../models/grid-direction";
-import MapConfiguration from "../models/map-configuration";
+import WorldConfig from "../models/world-config";
 import Queue from "../utils/queue";
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
 
@@ -12,7 +12,7 @@ class FlowField {
   private destination: Cell;
   cells: Cell[][];
 
-  constructor(private mapConfiguration: MapConfiguration, destinationCellI: number, destinationCellJ: number) {
+  constructor(private worldConfig: WorldConfig, destinationCellI: number, destinationCellJ: number) {
     this.cellCountX = MAP_GRID_WIDTH;
     this.cellCountY = MAP_GRID_HEIGHT;
     this.cells = Array.from({ length: this.cellCountX }, () => Array.from({ length: this.cellCountY }));
@@ -57,10 +57,10 @@ class FlowField {
       for (let j = 0; j < this.cellCountY; j++) {
         const cell = this.cells[i][j];
 
-        const isIslandCell = this.mapConfiguration.islands.some((islandPolygon) =>
+        const isIslandCell = this.worldConfig.islands.some((islandPolygon) =>
           islandPolygon.contains(cell.position.x, cell.position.y)
         );
-        const isStormCell = this.mapConfiguration.storms.some((stormPolygon) =>
+        const isStormCell = this.worldConfig.storms.some((stormPolygon) =>
           stormPolygon.contains(cell.position.x, cell.position.y)
         );
 

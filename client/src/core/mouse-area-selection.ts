@@ -26,6 +26,8 @@ class MouseAreaSelection extends GameObject {
 
       const { x, y } = e.global;
       this.selectedAreaStartPosition.set(x, y);
+
+      this.selectedAreaRectangle = new PIXI.Rectangle();
       this.selectedAreaGraphics.visible = true;
     });
 

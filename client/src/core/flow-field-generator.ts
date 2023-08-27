@@ -1,9 +1,9 @@
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
-import MapConfiguration from "../models/map-configuration";
+import WorldConfig from "../models/world-config";
 import FlowField from "./flow-field";
 
 class FlowFieldGenerator {
-  constructor(private mapConfiguration: MapConfiguration) {}
+  constructor(private worldConfig: WorldConfig) {}
 
   generateMultipleFlowFields(x: number, y: number, count: number, separationDistance: number): FlowField[] {
     const targetCellI = Math.floor(x / MAP_GRID_CELL_SIZE);
@@ -28,7 +28,7 @@ class FlowFieldGenerator {
       }
     }
 
-    return destinations.map((dest) => new FlowField(this.mapConfiguration, dest.i, dest.j));
+    return destinations.map((dest) => new FlowField(this.worldConfig, dest.i, dest.j));
   }
 }
 

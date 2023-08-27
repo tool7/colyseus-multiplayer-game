@@ -5,7 +5,6 @@ import {
   PLAYER_COLOR_SHIP_SPRITES,
   SHIP_MAX_VELOCITY,
   SHIP_HEIGHT,
-  SHIP_SELECTION_INDICATOR_COLOR,
   SHIP_WIDTH,
   SHIP_TURN_SPEED,
   SHIP_NEIGHBORHOOD_RADIUS,
@@ -35,10 +34,9 @@ class Ship extends GameObject {
   private selectionIndicator: PIXI.Graphics;
   private otherShips: Ship[];
 
-  constructor(playerColor: PlayerColor) {
+  constructor(private playerColor: PlayerColor) {
     super();
 
-    // TODO: Fix container position?
     this.container = new PIXI.Container();
     this.selectionIndicator = new PIXI.Graphics();
     this.selectionIndicator.visible = false;
@@ -158,13 +156,15 @@ class Ship extends GameObject {
     }
 
     const { x, y } = this.sprite;
-    const circleBorder = 4 + 8 * Math.abs(CameraState.zoomLevel - 1);
-    const circlePadding = 10;
+    const circleBorder = 2 + 5 * Math.abs(CameraState.zoomLevel - 1);
+    const circlePadding = 6;
     const circleFillOpacity = rangeLerp(CameraState.zoomLevel, 0.25, 1, 0.35, 0.05);
 
+    const color = this.playerColor.toString();
+
     this.selectionIndicator.clear();
-    this.selectionIndicator.lineStyle(circleBorder, SHIP_SELECTION_INDICATOR_COLOR, 0.75);
-    this.selectionIndicator.beginFill(SHIP_SELECTION_INDICATOR_COLOR, circleFillOpacity);
+    this.selectionIndicator.lineStyle(circleBorder, color, 0.75);
+    this.selectionIndicator.beginFill(color, circleFillOpacity);
     this.selectionIndicator.drawCircle(x, y, this.container.width / 2 + circlePadding);
     this.selectionIndicator.endFill();
   }

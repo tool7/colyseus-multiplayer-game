@@ -4,7 +4,7 @@ import { Viewport } from "pixi-viewport";
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
 import { rangeLerp, rgbToHex } from "../utils/helpers";
 import DebugController from "../utils/debug-controller";
-import MapConfiguration from "../models/map-configuration";
+import WorldConfig from "../models/world-config";
 import Ship from "./ship";
 import FlowFieldGenerator from "./flow-field-generator";
 import MouseAreaSelection from "./mouse-area-selection";
@@ -17,7 +17,7 @@ class ShipController {
   private debugFlowFieldTextContainer: PIXI.Container;
   private debugFlowFieldType: string;
 
-  constructor(private viewport: Viewport, private mapConfiguration: MapConfiguration, private playerShips: Ship[]) {
+  constructor(private viewport: Viewport, private worldConfig: WorldConfig, private playerShips: Ship[]) {
     this.selectedShips = [];
     this.mouseAreaSelection = new MouseAreaSelection(viewport);
 
@@ -74,7 +74,7 @@ class ShipController {
       return;
     }
 
-    const flowFieldGenerator = new FlowFieldGenerator(this.mapConfiguration);
+    const flowFieldGenerator = new FlowFieldGenerator(this.worldConfig);
     const flowFields = flowFieldGenerator.generateMultipleFlowFields(x, y, this.selectedShips.length, 1);
 
     this.selectedShips.forEach((ship, i) => {
@@ -129,7 +129,6 @@ class ShipController {
           const arrowY = position.y;
           this.debugFlowFieldVectors.moveTo(arrowX, arrowY);
           this.debugFlowFieldVectors.lineStyle(3, 0x000000, 0.5);
-          this.debugFlowFieldVectors.beginFill(0x000000, 1);
           this.debugFlowFieldVectors.lineTo(arrowX + bestDirection.x * 15, arrowY + bestDirection.y * 15);
           this.debugFlowFieldVectors.drawCircle(arrowX, arrowY, 3);
         }

@@ -2,13 +2,13 @@ import * as PIXI from "pixi.js";
 
 import seaSpriteBase64 from "../assets/sea.png";
 import GameObject from "../models/game-object";
-import MapConfiguration from "../models/map-configuration";
+import WorldConfig from "../models/world-config";
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
 
 class WorldMap extends GameObject {
   private container: PIXI.Container;
 
-  constructor(private mapConfiguration: MapConfiguration) {
+  constructor(private worldConfig: WorldConfig) {
     super();
 
     this.container = new PIXI.Container();
@@ -30,7 +30,7 @@ class WorldMap extends GameObject {
     background.height = MAP_GRID_HEIGHT * MAP_GRID_CELL_SIZE;
 
     const islandGaphics = new PIXI.Graphics();
-    this.mapConfiguration.islands.forEach((island) => {
+    this.worldConfig.islands.forEach((island) => {
       islandGaphics.lineStyle(30, 0xad8124);
       islandGaphics.beginFill(0x1b611b, 1);
       islandGaphics.drawPolygon(island);
@@ -38,7 +38,7 @@ class WorldMap extends GameObject {
     });
 
     const stormGraphics = new PIXI.Graphics();
-    this.mapConfiguration.storms.forEach((storm) => {
+    this.worldConfig.storms.forEach((storm) => {
       stormGraphics.lineStyle(0);
       stormGraphics.beginFill(0x4c9ded, 1);
       stormGraphics.drawPolygon(storm);
