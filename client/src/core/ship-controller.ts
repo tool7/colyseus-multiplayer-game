@@ -51,7 +51,7 @@ class ShipController {
         return;
       }
 
-      this.startShipsMovementToTarget(x, y);
+      this.setDestination(x, y, e.shiftKey);
       this.drawDebugFlowFieldGrid();
     });
 
@@ -69,7 +69,7 @@ class ShipController {
     return [this.mouseAreaSelection.renderObject];
   }
 
-  private startShipsMovementToTarget(x: number, y: number) {
+  private setDestination(x: number, y: number, append: boolean) {
     if (this.selectedShips.length === 0) {
       return;
     }
@@ -78,7 +78,7 @@ class ShipController {
     const flowFields = flowFieldGenerator.generateMultipleFlowFields(x, y, this.selectedShips.length, 1);
 
     this.selectedShips.forEach((ship, i) => {
-      ship.followFlowField(flowFields[i]);
+      ship.setFlowField(flowFields[i], !append);
     });
   }
 

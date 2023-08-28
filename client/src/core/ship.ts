@@ -17,6 +17,7 @@ import {
   normalizeVector,
   rangeLerp,
 } from "../utils/helpers";
+import Queue from "../utils/queue";
 import CameraState from "./camera-state";
 import GameObject from "../models/game-object";
 import PlayerColor from "../models/player-color";
@@ -33,6 +34,7 @@ class Ship extends GameObject {
   private isDestinationReached: boolean;
   private selectionIndicator: PIXI.Graphics;
   private otherShips: Ship[];
+  private flowFieldQueue: Queue<FlowField>;
 
   constructor(private playerColor: PlayerColor) {
     super();
@@ -53,6 +55,7 @@ class Ship extends GameObject {
     this.container.eventMode = "static";
 
     this.velocity = 0;
+    this.flowFieldQueue = new Queue<FlowField>();
     this.isMoving = false;
     this.isDestinationReached = false;
   }
@@ -77,11 +80,16 @@ class Ship extends GameObject {
     this.selectionIndicator.visible = isSelected;
   }
 
-  followFlowField(flowField: FlowField): void {
-    this.flowField = flowField;
-    this.destination = this.flowField.getDestinationPosition();
-    this.isDestinationReached = false;
-    this.isMoving = true;
+  setFlowField(flowField: FlowField, isNewRoute: boolean): void {
+    isNewRoute && this.flowFieldQueue.clear();
+    this.flowFieldQueue.enqueue(flowField);
+
+    if (!this.isMoving || isNewRoute) {
+      this.flowField = this.flowFieldQueue.dequeue();
+      this.destination = this.flowField.getDestinationPosition();
+      this.isDestinationReached = false;
+      this.isMoving = true;
+    }
   }
 
   update(delta: number): void {
@@ -100,7 +108,15 @@ class Ship extends GameObject {
       }
     } else {
       const distance = distanceBetweenPoints(this.container.position, this.destination);
-      this.isDestinationReached = distance <= MAP_GRID_CELL_SIZE;
+      if (distance <= MAP_GRID_CELL_SIZE) {
+        const nextFlowField = this.flowFieldQueue.dequeue();
+        if (nextFlowField) {
+          this.flowField = nextFlowField;
+          this.destination = this.flowField.getDestinationPosition();
+        } else {
+          this.isDestinationReached = true;
+        }
+      }
 
       // Gradually accelerating the ship up to the maximum velocity
       if (this.velocity < SHIP_MAX_VELOCITY) {

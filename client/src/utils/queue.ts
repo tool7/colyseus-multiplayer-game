@@ -15,12 +15,16 @@ class Queue<T> {
 
   dequeue(): T {
     if (this.elements.length === 0) {
-      return null as any;
+      return null;
     }
 
     let item = this.elements[0];
     this.elements.splice(0, 1);
     return item;
+  }
+
+  clear(): void {
+    this.elements = [];
   }
 }
 
