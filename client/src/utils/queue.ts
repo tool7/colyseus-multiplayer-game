@@ -23,6 +23,13 @@ class Queue<T> {
     return item;
   }
 
+  peak() {
+    if (this.elements.length === 0) {
+      return null;
+    }
+    return this.elements[0];
+  }
+
   clear(): void {
     this.elements = [];
   }

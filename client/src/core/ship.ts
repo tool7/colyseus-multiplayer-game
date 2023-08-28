@@ -24,17 +24,15 @@ import PlayerColor from "../models/player-color";
 import FlowField from "./flow-field";
 
 class Ship extends GameObject {
-  flowField: FlowField;
+  flowFieldQueue: Queue<FlowField>;
 
   private container: PIXI.Container;
   private sprite: PIXI.Sprite;
   private velocity: number;
-  private destination: PIXI.Point;
   private isMoving: boolean;
   private isDestinationReached: boolean;
   private selectionIndicator: PIXI.Graphics;
   private otherShips: Ship[];
-  private flowFieldQueue: Queue<FlowField>;
 
   constructor(private playerColor: PlayerColor) {
     super();
@@ -58,6 +56,8 @@ class Ship extends GameObject {
     this.flowFieldQueue = new Queue<FlowField>();
     this.isMoving = false;
     this.isDestinationReached = false;
+
+    CameraState.events.on("zoom-change", () => this.drawSelectionIndicator());
   }
 
   get renderObject() {
@@ -78,6 +78,7 @@ class Ship extends GameObject {
   setSelected(isSelected: boolean) {
     !isSelected && this.selectionIndicator.clear();
     this.selectionIndicator.visible = isSelected;
+    this.drawSelectionIndicator();
   }
 
   setFlowField(flowField: FlowField, isNewRoute: boolean): void {
@@ -85,16 +86,12 @@ class Ship extends GameObject {
     this.flowFieldQueue.enqueue(flowField);
 
     if (!this.isMoving || isNewRoute) {
-      this.flowField = this.flowFieldQueue.dequeue();
-      this.destination = this.flowField.getDestinationPosition();
       this.isDestinationReached = false;
       this.isMoving = true;
     }
   }
 
-  update(delta: number): void {
-    this.drawSelectionIndicator();
-
+  update(delta: number) {
     if (!this.isMoving) {
       return;
     }
@@ -107,13 +104,16 @@ class Ship extends GameObject {
         this.isMoving = false;
       }
     } else {
-      const distance = distanceBetweenPoints(this.container.position, this.destination);
+      let currentFlowField = this.flowFieldQueue.peak();
+
+      const destination = currentFlowField.getDestinationPosition();
+      const distance = distanceBetweenPoints(this.container.position, destination);
+
       if (distance <= MAP_GRID_CELL_SIZE) {
-        const nextFlowField = this.flowFieldQueue.dequeue();
-        if (nextFlowField) {
-          this.flowField = nextFlowField;
-          this.destination = this.flowField.getDestinationPosition();
-        } else {
+        this.flowFieldQueue.dequeue();
+
+        currentFlowField = this.flowFieldQueue.peak();
+        if (!currentFlowField) {
           this.isDestinationReached = true;
         }
       }
@@ -124,8 +124,10 @@ class Ship extends GameObject {
       }
 
       // Calculating the desired angle based on the flow field's direction
-      const { bestDirection } = this.flowField.getCellAtPosition(this.container.x, this.container.y);
-      const desiredAngle = Math.atan2(bestDirection.y, bestDirection.x);
+      const direction = currentFlowField
+        ? currentFlowField.getCellAtPosition(this.container.x, this.container.y).bestDirection
+        : new PIXI.Point();
+      const desiredAngle = Math.atan2(direction.y, direction.x);
 
       // Gradually adjusting the ship's rotation to the desired angle
       const angleDifference = normalizeAngle(desiredAngle - this.container.rotation);

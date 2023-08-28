@@ -68,9 +68,10 @@ window.onload = () => {
   });
 
   const shipController = new ShipController(viewport, worldConfig, playerShips);
-  shipController.getRenderObjects().forEach((renderObject) => {
-    app.stage.addChild(renderObject);
-  });
+  gameObjects.push(shipController);
+  viewport.addChild(shipController.renderObject);
+
+  app.stage.addChild(shipController.mouseAreaSelection.renderObject);
 };
 
 app.ticker.add((delta) => {

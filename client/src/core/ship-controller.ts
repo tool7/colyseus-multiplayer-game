@@ -4,20 +4,29 @@ import { Viewport } from "pixi-viewport";
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
 import { rangeLerp, rgbToHex } from "../utils/helpers";
 import DebugController from "../utils/debug-controller";
+import GameObject from "../models/game-object";
 import WorldConfig from "../models/world-config";
 import Ship from "./ship";
 import FlowFieldGenerator from "./flow-field-generator";
 import MouseAreaSelection from "./mouse-area-selection";
 
-class ShipController {
+class ShipController extends GameObject {
+  mouseAreaSelection: MouseAreaSelection;
+
   private selectedShips: Ship[];
-  private mouseAreaSelection: MouseAreaSelection;
+  private container: PIXI.Container;
+  private destinationSpriteTexture: PIXI.Texture;
+  private destinationSpriteContainer: PIXI.Container;
+  private destinationLineIndicators: PIXI.Graphics;
+
   private debugFlowFieldGrid: PIXI.Graphics;
   private debugFlowFieldVectors: PIXI.Graphics;
   private debugFlowFieldTextContainer: PIXI.Container;
   private debugFlowFieldType: string;
 
-  constructor(private viewport: Viewport, private worldConfig: WorldConfig, private playerShips: Ship[]) {
+  constructor(viewport: Viewport, private worldConfig: WorldConfig, private playerShips: Ship[]) {
+    super();
+
     this.selectedShips = [];
     this.mouseAreaSelection = new MouseAreaSelection(viewport);
 
@@ -41,7 +50,6 @@ class ShipController {
         return area.contains(global.x, global.y);
       });
       this.selectedShips.forEach((ship) => ship.setSelected(true));
-
       this.drawDebugFlowFieldGrid();
     });
 
@@ -55,6 +63,14 @@ class ShipController {
       this.drawDebugFlowFieldGrid();
     });
 
+    this.destinationSpriteTexture = PIXI.Texture.from("dist/assets/destination-indicator.png");
+    this.destinationSpriteContainer = new PIXI.Container();
+    this.destinationLineIndicators = new PIXI.Graphics();
+
+    this.container = new PIXI.Container();
+    this.container.addChild(this.destinationSpriteContainer);
+    this.container.addChild(this.destinationLineIndicators);
+
     this.debugFlowFieldGrid = new PIXI.Graphics();
     this.debugFlowFieldVectors = new PIXI.Graphics();
     this.debugFlowFieldTextContainer = new PIXI.Container();
@@ -64,9 +80,15 @@ class ShipController {
     });
   }
 
-  // TODO: Need a better way of handling this
-  getRenderObjects(): PIXI.DisplayObject[] {
-    return [this.mouseAreaSelection.renderObject];
+  get renderObject() {
+    return this.container;
+  }
+  get transform() {
+    return this.container.transform;
+  }
+
+  update() {
+    this.updateDestinationIndicators();
   }
 
   private setDestination(x: number, y: number, append: boolean) {
@@ -82,22 +104,53 @@ class ShipController {
     });
   }
 
-  private drawDebugFlowFieldGrid() {
-    if (this.selectedShips.length !== 1 || !this.selectedShips[0].flowField || !this.debugFlowFieldType) {
-      this.viewport.removeChild(this.debugFlowFieldGrid);
-      this.viewport.removeChild(this.debugFlowFieldVectors);
-      this.viewport.removeChild(this.debugFlowFieldTextContainer);
+  private updateDestinationIndicators() {
+    this.destinationSpriteContainer.removeChildren();
+    this.destinationLineIndicators.clear();
+
+    if (this.selectedShips.length === 0) {
       return;
     }
 
-    this.viewport.addChild(this.debugFlowFieldGrid);
-    this.viewport.addChild(this.debugFlowFieldVectors);
-    this.viewport.addChild(this.debugFlowFieldTextContainer);
+    const addSpriteToContainer = ({ x, y }: PIXI.Point) => {
+      const sprite = PIXI.Sprite.from(this.destinationSpriteTexture);
+      sprite.position.set(x, y);
+      sprite.anchor.set(0.5, 0.5);
+      sprite.scale.set(0.8);
+      this.destinationSpriteContainer.addChild(sprite);
+    };
+
+    this.selectedShips.forEach((ship) => {
+      if (ship.flowFieldQueue.elements.length === 0) {
+        return;
+      }
+      this.destinationLineIndicators.moveTo(ship.renderObject.x, ship.renderObject.y);
+      this.destinationLineIndicators.lineStyle(1, 0x000000, 0.5);
+
+      const destinations = ship.flowFieldQueue.elements.map((flowField) => flowField.getDestinationPosition());
+      destinations.forEach((dest) => {
+        addSpriteToContainer(dest);
+        this.destinationLineIndicators.lineTo(dest.x, dest.y);
+      });
+    });
+  }
+
+  private drawDebugFlowFieldGrid() {
+    if (this.selectedShips.length !== 1 || !this.selectedShips[0].flowFieldQueue.peak() || !this.debugFlowFieldType) {
+      this.container.removeChild(this.debugFlowFieldGrid);
+      this.container.removeChild(this.debugFlowFieldVectors);
+      this.container.removeChild(this.debugFlowFieldTextContainer);
+      return;
+    }
+
+    this.container.addChild(this.debugFlowFieldGrid);
+    this.container.addChild(this.debugFlowFieldVectors);
+    this.container.addChild(this.debugFlowFieldTextContainer);
     this.debugFlowFieldGrid.clear();
     this.debugFlowFieldTextContainer.removeChildren();
     this.debugFlowFieldVectors.clear();
 
-    const { cells } = this.selectedShips[0].flowField;
+    const { cells } = this.selectedShips[0].flowFieldQueue.peak();
 
     for (let i = 0; i < MAP_GRID_WIDTH; i++) {
       for (let j = 0; j < MAP_GRID_HEIGHT; j++) {
