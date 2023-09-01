@@ -36,7 +36,7 @@ app.stage.addChild(viewport);
 
 viewport
   .drag({ mouseButtons: "middle" })
-  .wheel()
+  .wheel({ smooth: 8 })
   .clampZoom({ maxScale: 1, minScale: 0.25 })
   .animate({ ease: "linear", time: 1000 });
 
