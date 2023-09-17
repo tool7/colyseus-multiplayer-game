@@ -37,6 +37,30 @@ function normalizeAngle(angle: number): number {
   return angle;
 }
 
+function transformPolygonToWorldCoords(
+  polygon: PIXI.Polygon,
+  width: number,
+  height: number,
+  xOffset: number,
+  yOffset: number,
+  scaleFactor: number
+): PIXI.Polygon {
+  const polygonPoints: { x: number; y: number }[] = [];
+  for (let i = 0; i < polygon.points.length - 1; i += 2) {
+    const x = polygon.points[i];
+    const y = polygon.points[i + 1];
+    polygonPoints.push({ x, y });
+  }
+
+  const transformedVertices = polygonPoints.map(({ x, y }) => {
+    return {
+      x: x * scaleFactor + xOffset - (width * scaleFactor) / 2,
+      y: y * scaleFactor + yOffset - (height * scaleFactor) / 2,
+    };
+  });
+  return new PIXI.Polygon(transformedVertices);
+}
+
 function rgbToHex(r: number, g: number, b: number) {
   r = Math.min(255, Math.max(0, r));
   g = Math.min(255, Math.max(0, g));
@@ -57,5 +81,6 @@ export {
   degreesToRadians,
   normalizeVector,
   normalizeAngle,
+  transformPolygonToWorldCoords,
   rgbToHex,
 };

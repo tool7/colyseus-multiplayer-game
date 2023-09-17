@@ -5,7 +5,7 @@ import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/co
 import { rangeLerp, rgbToHex } from "../utils/helpers";
 import DebugController from "../utils/debug-controller";
 import GameObject from "../models/game-object";
-import WorldConfig from "../models/world-config";
+import { WorldConfig } from "../models/world-config";
 import Ship from "./ship";
 import FlowFieldGenerator from "./flow-field-generator";
 import MouseAreaSelection from "./mouse-area-selection";

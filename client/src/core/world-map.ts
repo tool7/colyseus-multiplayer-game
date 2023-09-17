@@ -2,17 +2,28 @@ import * as PIXI from "pixi.js";
 
 import seaSpriteBase64 from "../assets/sea.png";
 import GameObject from "../models/game-object";
-import WorldConfig from "../models/world-config";
+import { WorldConfig } from "../models/world-config";
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
+import { transformPolygonToWorldCoords } from "../utils/helpers";
+import DebugController from "../utils/debug-controller";
 
 class WorldMap extends GameObject {
   private container: PIXI.Container;
+
+  private showDebugColliders: boolean;
+  private colliderDebugGraphics: PIXI.Graphics;
 
   constructor(private worldConfig: WorldConfig) {
     super();
 
     this.container = new PIXI.Container();
     this.drawMap();
+    this.colliderDebugGraphics = new PIXI.Graphics();
+
+    DebugController.onChange("showColliders", (value: boolean) => {
+      this.showDebugColliders = value;
+      this.drawDebugColliders();
+    });
   }
 
   get renderObject() {
@@ -29,25 +40,57 @@ class WorldMap extends GameObject {
     background.width = MAP_GRID_WIDTH * MAP_GRID_CELL_SIZE;
     background.height = MAP_GRID_HEIGHT * MAP_GRID_CELL_SIZE;
 
-    const islandGaphics = new PIXI.Graphics();
-    this.worldConfig.islands.forEach((island) => {
-      islandGaphics.lineStyle(30, 0xad8124);
-      islandGaphics.beginFill(0x1b611b, 1);
-      islandGaphics.drawPolygon(island);
-      islandGaphics.endFill();
-    });
-
-    const stormGraphics = new PIXI.Graphics();
-    this.worldConfig.storms.forEach((storm) => {
-      stormGraphics.lineStyle(0);
-      stormGraphics.beginFill(0x4c9ded, 1);
-      stormGraphics.drawPolygon(storm);
-      stormGraphics.endFill();
-    });
-
     this.container.addChild(background);
-    this.container.addChild(islandGaphics);
-    this.container.addChild(stormGraphics);
+
+    this.worldConfig.islands.forEach((island) => {
+      const islandTexture = PIXI.Texture.from(island.spriteAssetPath);
+      const islandSprite = PIXI.Sprite.from(islandTexture);
+      islandSprite.position.set(island.position.x, island.position.y);
+      islandSprite.anchor.set(0.5, 0.5);
+      islandSprite.scale.set(island.scaleFactor);
+
+      this.container.addChild(islandSprite);
+    });
+
+    this.worldConfig.storms.forEach((storm) => {});
+  }
+
+  private drawDebugColliders() {
+    if (!this.showDebugColliders) {
+      this.container.removeChild(this.colliderDebugGraphics);
+      return;
+    }
+
+    this.container.addChild(this.colliderDebugGraphics);
+    this.colliderDebugGraphics.clear();
+
+    this.worldConfig.islands.forEach(
+      ({ collider, highGroundCollider, spriteWidth, spriteHeight, position, scaleFactor }) => {
+        const absoluteIslandCollider = transformPolygonToWorldCoords(
+          collider,
+          spriteWidth,
+          spriteHeight,
+          position.x,
+          position.y,
+          scaleFactor
+        );
+        this.colliderDebugGraphics.lineStyle(2, 0xff0000);
+        this.colliderDebugGraphics.drawPolygon(absoluteIslandCollider);
+
+        if (highGroundCollider) {
+          const absoluteHighGroundCollider = transformPolygonToWorldCoords(
+            highGroundCollider,
+            spriteWidth,
+            spriteHeight,
+            position.x,
+            position.y,
+            scaleFactor
+          );
+          this.colliderDebugGraphics.lineStyle(2, 0x000000);
+          this.colliderDebugGraphics.drawPolygon(absoluteHighGroundCollider);
+        }
+      }
+    );
   }
 }
 

@@ -1,5 +1,5 @@
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
-import WorldConfig from "../models/world-config";
+import { WorldConfig } from "../models/world-config";
 import FlowField from "./flow-field";
 
 class FlowFieldGenerator {

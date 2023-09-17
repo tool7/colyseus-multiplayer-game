@@ -12,7 +12,7 @@ import WORLDS from "./data/worlds";
 
 const gameContainer = document.querySelector(".game") as HTMLDivElement;
 const gameObjects: GameObject[] = [];
-const worldConfig = WORLDS.DUMMY;
+const worldConfig = WORLDS.WORLD_4;
 
 DebugController.init();
 

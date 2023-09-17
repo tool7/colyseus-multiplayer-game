@@ -1,13 +1,14 @@
 import * as dat from "dat.gui";
 import * as PIXI from "pixi.js";
 
-type DebugControl = "flowFieldType";
+type DebugControl = "flowFieldType" | "showColliders";
 
 class DebugController {
   private static datGui: dat.GUI;
   private static onControlChange = new PIXI.utils.EventEmitter<DebugControl>();
   private static controls: Record<DebugControl, any> = {
     flowFieldType: null,
+    showColliders: false,
   };
 
   static init() {
@@ -21,6 +22,10 @@ class DebugController {
       })
       .name("Show field type:")
       .onChange((value) => this.onControlChange.emit("flowFieldType", value));
+    this.datGui
+      .add(this.controls, "showColliders")
+      .name("Show colliders:")
+      .onChange((value) => this.onControlChange.emit("showColliders", value));
 
     this.datGui.show();
   }

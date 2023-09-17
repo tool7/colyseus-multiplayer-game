@@ -2,8 +2,9 @@ import * as PIXI from "pixi.js";
 
 import Cell from "../models/cell";
 import GridDirection from "../models/grid-direction";
-import WorldConfig from "../models/world-config";
+import { WorldConfig } from "../models/world-config";
 import Queue from "../utils/queue";
+import { transformPolygonToWorldCoords } from "../utils/helpers";
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
 
 class FlowField {
@@ -57,11 +58,31 @@ class FlowField {
       for (let j = 0; j < this.cellCountY; j++) {
         const cell = this.cells[i][j];
 
-        const isIslandCell = this.worldConfig.islands.some((islandPolygon) =>
-          islandPolygon.contains(cell.position.x, cell.position.y)
+        const isIslandCell = this.worldConfig.islands.some(
+          ({ collider, spriteWidth, spriteHeight, position, scaleFactor }) => {
+            const absoluteIslandCollider = transformPolygonToWorldCoords(
+              collider,
+              spriteWidth,
+              spriteHeight,
+              position.x,
+              position.y,
+              scaleFactor
+            );
+            return absoluteIslandCollider.contains(cell.position.x, cell.position.y);
+          }
         );
-        const isStormCell = this.worldConfig.storms.some((stormPolygon) =>
-          stormPolygon.contains(cell.position.x, cell.position.y)
+        const isStormCell = this.worldConfig.storms.some(
+          ({ collider, spriteWidth, spriteHeight, position, scaleFactor }) => {
+            const absoluteStormCollider = transformPolygonToWorldCoords(
+              collider,
+              spriteWidth,
+              spriteHeight,
+              position.x,
+              position.y,
+              scaleFactor
+            );
+            return absoluteStormCollider.contains(cell.position.x, cell.position.y);
+          }
         );
 
         if (isIslandCell) {
