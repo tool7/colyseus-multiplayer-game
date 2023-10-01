@@ -65,7 +65,7 @@ class WorldMap extends GameObject {
     this.colliderDebugGraphics.clear();
 
     this.worldConfig.islands.forEach(
-      ({ collider, highGroundCollider, spriteWidth, spriteHeight, position, scaleFactor }) => {
+      ({ collider, highGroundColliders, spriteWidth, spriteHeight, position, scaleFactor }) => {
         const absoluteIslandCollider = transformPolygonToWorldCoords(
           collider,
           spriteWidth,
@@ -77,17 +77,19 @@ class WorldMap extends GameObject {
         this.colliderDebugGraphics.lineStyle(2, 0xff0000);
         this.colliderDebugGraphics.drawPolygon(absoluteIslandCollider);
 
-        if (highGroundCollider) {
-          const absoluteHighGroundCollider = transformPolygonToWorldCoords(
-            highGroundCollider,
-            spriteWidth,
-            spriteHeight,
-            position.x,
-            position.y,
-            scaleFactor
-          );
-          this.colliderDebugGraphics.lineStyle(2, 0x000000);
-          this.colliderDebugGraphics.drawPolygon(absoluteHighGroundCollider);
+        if (highGroundColliders) {
+          highGroundColliders.forEach((highGroundCollider) => {
+            const absoluteHighGroundCollider = transformPolygonToWorldCoords(
+              highGroundCollider,
+              spriteWidth,
+              spriteHeight,
+              position.x,
+              position.y,
+              scaleFactor
+            );
+            this.colliderDebugGraphics.lineStyle(2, 0x000000);
+            this.colliderDebugGraphics.drawPolygon(absoluteHighGroundCollider);
+          });
         }
       }
     );

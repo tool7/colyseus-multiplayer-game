@@ -15,7 +15,7 @@ export type Island = {
   spriteHeight: number;
   spriteAssetPath: string;
   collider: PIXI.Polygon;
-  highGroundCollider?: PIXI.Polygon;
+  highGroundColliders?: PIXI.Polygon[];
 };
 
 export type Storm = {
