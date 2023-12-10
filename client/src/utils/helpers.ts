@@ -43,7 +43,8 @@ function transformPolygonToWorldCoords(
   height: number,
   xOffset: number,
   yOffset: number,
-  scaleFactor: number
+  scaleFactor: number,
+  rotation: number = 0
 ): PIXI.Polygon {
   const polygonPoints: { x: number; y: number }[] = [];
   for (let i = 0; i < polygon.points.length - 1; i += 2) {
@@ -52,13 +53,27 @@ function transformPolygonToWorldCoords(
     polygonPoints.push({ x, y });
   }
 
-  const transformedVertices = polygonPoints.map(({ x, y }) => {
+  const transformationMatrix = new PIXI.Matrix().setTransform(
+    xOffset,
+    yOffset,
+    width / 2,
+    height / 2,
+    scaleFactor,
+    scaleFactor,
+    rotation,
+    0,
+    0
+  );
+
+  const transformedPoints = polygonPoints.map((point) => {
+    const transformedPoint = transformationMatrix.apply(point);
     return {
-      x: x * scaleFactor + xOffset - (width * scaleFactor) / 2,
-      y: y * scaleFactor + yOffset - (height * scaleFactor) / 2,
+      x: transformedPoint.x,
+      y: transformedPoint.y,
     };
   });
-  return new PIXI.Polygon(transformedVertices);
+
+  return new PIXI.Polygon(transformedPoints);
 }
 
 function rgbToHex(r: number, g: number, b: number) {

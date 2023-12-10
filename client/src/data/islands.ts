@@ -24,6 +24,7 @@ type IslandType =
 const ISLANDS: Record<IslandType, Island> = {
   HIGH_1: {
     position: { x: 0, y: 0 },
+    rotation: 0,
     scaleFactor: 1,
     spriteWidth: 772,
     spriteHeight: 777,
@@ -87,6 +88,7 @@ const ISLANDS: Record<IslandType, Island> = {
   },
   HIGH_2: {
     position: { x: 0, y: 0 },
+    rotation: 0,
     scaleFactor: 1,
     spriteWidth: 778,
     spriteHeight: 826,
@@ -146,6 +148,7 @@ const ISLANDS: Record<IslandType, Island> = {
   },
   HIGH_3: {
     position: { x: 0, y: 0 },
+    rotation: 0,
     scaleFactor: 1,
     spriteWidth: 528,
     spriteHeight: 816,
@@ -206,6 +209,7 @@ const ISLANDS: Record<IslandType, Island> = {
   },
   HIGH_4: {
     position: { x: 0, y: 0 },
+    rotation: 0,
     scaleFactor: 1,
     spriteWidth: 718,
     spriteHeight: 569,
@@ -287,6 +291,7 @@ const ISLANDS: Record<IslandType, Island> = {
   },
   HIGH_5: {
     position: { x: 0, y: 0 },
+    rotation: 0,
     scaleFactor: 1,
     spriteWidth: 464,
     spriteHeight: 790,
@@ -369,6 +374,7 @@ const ISLANDS: Record<IslandType, Island> = {
   },
   LOW_1: {
     position: { x: 0, y: 0 },
+    rotation: 0,
     scaleFactor: 1,
     spriteWidth: 494,
     spriteHeight: 628,
@@ -398,6 +404,7 @@ const ISLANDS: Record<IslandType, Island> = {
   },
   LOW_2: {
     position: { x: 0, y: 0 },
+    rotation: 0,
     scaleFactor: 1,
     spriteWidth: 490,
     spriteHeight: 557,
@@ -427,6 +434,7 @@ const ISLANDS: Record<IslandType, Island> = {
   },
   LOW_3: {
     position: { x: 0, y: 0 },
+    rotation: 0,
     scaleFactor: 1,
     spriteWidth: 403,
     spriteHeight: 408,
@@ -452,6 +460,7 @@ const ISLANDS: Record<IslandType, Island> = {
   },
   LOW_4: {
     position: { x: 0, y: 0 },
+    rotation: 0,
     scaleFactor: 1,
     spriteWidth: 494,
     spriteHeight: 489,
@@ -478,6 +487,7 @@ const ISLANDS: Record<IslandType, Island> = {
   },
   LOW_5: {
     position: { x: 0, y: 0 },
+    rotation: 0,
     scaleFactor: 1,
     spriteWidth: 408,
     spriteHeight: 792,

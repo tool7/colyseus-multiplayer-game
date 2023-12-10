@@ -10,6 +10,7 @@ export type PlayerSetup = {
 
 export type Island = {
   position: { x: number; y: number };
+  rotation: number;
   scaleFactor: number;
   spriteWidth: number;
   spriteHeight: number;

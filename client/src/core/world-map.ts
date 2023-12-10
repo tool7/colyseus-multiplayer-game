@@ -45,9 +45,10 @@ class WorldMap extends GameObject {
     this.worldConfig.islands.forEach((island) => {
       const islandTexture = PIXI.Texture.from(island.spriteAssetPath);
       const islandSprite = PIXI.Sprite.from(islandTexture);
-      islandSprite.position.set(island.position.x, island.position.y);
       islandSprite.anchor.set(0.5, 0.5);
+      islandSprite.position.set(island.position.x, island.position.y);
       islandSprite.scale.set(island.scaleFactor);
+      islandSprite.rotation = island.rotation;
 
       this.container.addChild(islandSprite);
     });
@@ -65,14 +66,15 @@ class WorldMap extends GameObject {
     this.colliderDebugGraphics.clear();
 
     this.worldConfig.islands.forEach(
-      ({ collider, highGroundColliders, spriteWidth, spriteHeight, position, scaleFactor }) => {
+      ({ collider, highGroundColliders, spriteWidth, spriteHeight, position, scaleFactor, rotation }) => {
         const absoluteIslandCollider = transformPolygonToWorldCoords(
           collider,
           spriteWidth,
           spriteHeight,
           position.x,
           position.y,
-          scaleFactor
+          scaleFactor,
+          rotation
         );
         this.colliderDebugGraphics.lineStyle(2, 0xff0000);
         this.colliderDebugGraphics.drawPolygon(absoluteIslandCollider);
@@ -85,7 +87,8 @@ class WorldMap extends GameObject {
               spriteHeight,
               position.x,
               position.y,
-              scaleFactor
+              scaleFactor,
+              rotation
             );
             this.colliderDebugGraphics.lineStyle(2, 0x000000);
             this.colliderDebugGraphics.drawPolygon(absoluteHighGroundCollider);

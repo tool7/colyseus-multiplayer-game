@@ -59,14 +59,15 @@ class FlowField {
         const cell = this.cells[i][j];
 
         const isIslandCell = this.worldConfig.islands.some(
-          ({ collider, spriteWidth, spriteHeight, position, scaleFactor }) => {
+          ({ collider, spriteWidth, spriteHeight, position, scaleFactor, rotation }) => {
             const absoluteIslandCollider = transformPolygonToWorldCoords(
               collider,
               spriteWidth,
               spriteHeight,
               position.x,
               position.y,
-              scaleFactor
+              scaleFactor,
+              rotation
             );
             return absoluteIslandCollider.contains(cell.position.x, cell.position.y);
           }
