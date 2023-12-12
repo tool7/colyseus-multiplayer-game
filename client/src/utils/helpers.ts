@@ -1,4 +1,5 @@
 import * as PIXI from "pixi.js";
+import WindDirection from "../models/wind-direction";
 
 function distanceBetweenPoints(p1: PIXI.Point, p2: PIXI.Point): number {
   const a = p1.x - p2.x;
@@ -88,6 +89,27 @@ function rgbToHex(r: number, g: number, b: number) {
   return `#${hexR}${hexG}${hexB}`;
 }
 
+function mapWindDirectionToWavesVector(windDirection: WindDirection): PIXI.Point {
+  switch (windDirection) {
+    case WindDirection.NORTH:
+      return new PIXI.Point(0, 1);
+    case WindDirection.NORTH_EAST:
+      return new PIXI.Point(-1, 1);
+    case WindDirection.EAST:
+      return new PIXI.Point(-1, 0);
+    case WindDirection.SOUTH_EAST:
+      return new PIXI.Point(-1, -1);
+    case WindDirection.SOUTH:
+      return new PIXI.Point(0, -1);
+    case WindDirection.SOUTH_WEST:
+      return new PIXI.Point(1, -1);
+    case WindDirection.WEST:
+      return new PIXI.Point(1, 0);
+    case WindDirection.NORTH_WEST:
+      return new PIXI.Point(1, 1);
+  }
+}
+
 export {
   distanceBetweenPoints,
   getVectorBetweenPoints,
@@ -98,4 +120,5 @@ export {
   normalizeAngle,
   transformPolygonToWorldCoords,
   rgbToHex,
+  mapWindDirectionToWavesVector,
 };

@@ -2,13 +2,16 @@ import * as PIXI from "pixi.js";
 
 import seaSpriteBase64 from "../assets/sea.png";
 import GameObject from "../models/game-object";
+import Waves from "./waves";
 import { WorldConfig } from "../models/world-config";
+import WindDirection from "../models/wind-direction";
 import { MAP_GRID_CELL_SIZE, MAP_GRID_HEIGHT, MAP_GRID_WIDTH } from "../utils/constants";
 import { transformPolygonToWorldCoords } from "../utils/helpers";
 import DebugController from "../utils/debug-controller";
 
 class WorldMap extends GameObject {
   private container: PIXI.Container;
+  private waves: Waves;
 
   private showDebugColliders: boolean;
   private colliderDebugGraphics: PIXI.Graphics;
@@ -17,9 +20,16 @@ class WorldMap extends GameObject {
     super();
 
     this.container = new PIXI.Container();
+    this.waves = new Waves();
     this.drawMap();
-    this.colliderDebugGraphics = new PIXI.Graphics();
 
+    // TODO: Get "windDirection" and "windSpeed" from some kind of game state object
+    const windDirection = WindDirection.NORTH_WEST;
+    const windSpeed = 0.2;
+    this.waves.setWavesSpeed(windSpeed);
+    this.waves.setWavesSpriteByWindDirection(windDirection);
+
+    this.colliderDebugGraphics = new PIXI.Graphics();
     DebugController.onChange("showColliders", (value: boolean) => {
       this.showDebugColliders = value;
       this.drawDebugColliders();
@@ -32,7 +42,10 @@ class WorldMap extends GameObject {
   get transform() {
     return this.container.transform;
   }
-  update() {}
+
+  update(delta: number) {
+    this.waves.update(delta);
+  }
 
   private drawMap() {
     const seaTexture = PIXI.Texture.from(seaSpriteBase64);
@@ -41,6 +54,7 @@ class WorldMap extends GameObject {
     background.height = MAP_GRID_HEIGHT * MAP_GRID_CELL_SIZE;
 
     this.container.addChild(background);
+    this.container.addChild(this.waves.renderObject);
 
     this.worldConfig.islands.forEach((island) => {
       const islandTexture = PIXI.Texture.from(island.spriteAssetPath);

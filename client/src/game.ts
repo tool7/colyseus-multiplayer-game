@@ -50,6 +50,7 @@ CameraState.setZoomLevel(viewport.scaled);
 
 window.onload = () => {
   const worldMap = new WorldMap(worldConfig);
+  gameObjects.push(worldMap);
   viewport.addChild(worldMap.renderObject);
 
   const playerShips: Ship[] = [];
