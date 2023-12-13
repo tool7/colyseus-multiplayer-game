@@ -12,13 +12,14 @@ import WORLDS from "./data/worlds";
 
 const gameContainer = document.querySelector(".game") as HTMLDivElement;
 const gameObjects: GameObject[] = [];
-const worldConfig = WORLDS.WORLD_4;
+const worldConfig = WORLDS.WORLD_1;
 
 DebugController.init();
 
 const app = new PIXI.Application<HTMLCanvasElement>({
   resizeTo: gameContainer,
   resolution: window.devicePixelRatio,
+  background: "#3ED5ED",
 });
 gameContainer.appendChild(app.view);
 
