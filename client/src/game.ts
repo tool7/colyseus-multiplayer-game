@@ -6,6 +6,7 @@ import GameObject from "./models/game-object";
 import Ship from "./core/ship";
 import CameraState from "./core/camera-state";
 import WorldMap from "./core/world-map";
+import CameraController from "./core/camera-controller";
 import ShipController from "./core/ship-controller";
 import DebugController from "./utils/debug-controller";
 import WORLDS from "./data/worlds";
@@ -68,6 +69,9 @@ window.onload = () => {
     gameObjects.push(ship);
     viewport.addChild(ship.renderObject);
   });
+
+  const cameraController = new CameraController(viewport);
+  gameObjects.push(cameraController);
 
   const shipController = new ShipController(viewport, worldConfig, playerShips);
   gameObjects.push(shipController);
