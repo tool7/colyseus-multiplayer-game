@@ -15,6 +15,16 @@ function getVectorMagnitude(vector: PIXI.Point): number {
   return Math.sqrt(vector.x ** 2 + vector.y ** 2);
 }
 
+function lerp(a: number, b: number, t: number): number {
+  if (t < 0) {
+    return a;
+  }
+  if (t > 1) {
+    return b;
+  }
+  return a + (b - a) * t;
+}
+
 function rangeLerp(value: number, min1: number, max1: number, min2: number, max2: number): number {
   return min2 + (max2 - min2) * ((value - min1) / (max1 - min1));
 }
@@ -114,6 +124,7 @@ export {
   distanceBetweenPoints,
   getVectorBetweenPoints,
   getVectorMagnitude,
+  lerp,
   rangeLerp,
   degreesToRadians,
   normalizeVector,

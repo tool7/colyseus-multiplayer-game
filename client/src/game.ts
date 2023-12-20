@@ -4,9 +4,8 @@ import { Viewport } from "pixi-viewport";
 import { MAP_GRID_WIDTH, MAP_GRID_HEIGHT, MAP_GRID_CELL_SIZE } from "./utils/constants";
 import GameObject from "./models/game-object";
 import Ship from "./core/ship";
-import CameraState from "./core/camera-state";
 import WorldMap from "./core/world-map";
-import CameraController from "./core/camera-controller";
+import Camera from "./core/camera";
 import ShipController from "./core/ship-controller";
 import DebugController from "./utils/debug-controller";
 import WORLDS from "./data/worlds";
@@ -36,19 +35,8 @@ const viewport = new Viewport({
 });
 app.stage.addChild(viewport);
 
-viewport
-  .drag({ mouseButtons: "middle" })
-  .wheel({ smooth: 8 })
-  .clampZoom({ maxScale: 1, minScale: 0.25 })
-  .animate({ ease: "linear", time: 1000 });
-
 viewport.fit();
 viewport.moveCenter(viewport.worldWidth / 2, viewport.worldHeight / 2);
-viewport.on("zoomed", () => {
-  CameraState.setZoomLevel(viewport.scaled);
-});
-
-CameraState.setZoomLevel(viewport.scaled);
 
 window.onload = () => {
   const worldMap = new WorldMap(worldConfig);
@@ -70,8 +58,8 @@ window.onload = () => {
     viewport.addChild(ship.renderObject);
   });
 
-  const cameraController = new CameraController(viewport);
-  gameObjects.push(cameraController);
+  const camera = new Camera(viewport);
+  gameObjects.push(camera);
 
   const shipController = new ShipController(viewport, worldConfig, playerShips);
   gameObjects.push(shipController);

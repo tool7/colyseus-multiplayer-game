@@ -18,10 +18,10 @@ import {
   rangeLerp,
 } from "../utils/helpers";
 import Queue from "../utils/queue";
-import CameraState from "./camera-state";
 import GameObject from "../models/game-object";
 import PlayerColor from "../models/player-color";
 import FlowField from "./flow-field";
+import Camera from "./camera";
 
 class Ship extends GameObject {
   flowFieldQueue: Queue<FlowField>;
@@ -57,7 +57,7 @@ class Ship extends GameObject {
     this.isMoving = false;
     this.isDestinationReached = false;
 
-    CameraState.events.on("zoom-change", () => this.drawSelectionIndicator());
+    Camera.events.on("zoom-change", () => this.drawSelectionIndicator());
   }
 
   get renderObject() {
@@ -174,9 +174,9 @@ class Ship extends GameObject {
     }
 
     const { x, y } = this.sprite;
-    const circleBorder = 2 + 5 * Math.abs(CameraState.zoomLevel - 1);
+    const circleBorder = 2 + 5 * Math.abs(Camera.zoomLevel - 1);
     const circlePadding = 6;
-    const circleFillOpacity = rangeLerp(CameraState.zoomLevel, 0.25, 1, 0.35, 0.05);
+    const circleFillOpacity = rangeLerp(Camera.zoomLevel, 0.25, 1, 0.35, 0.05);
 
     const color = this.playerColor.toString();
 
