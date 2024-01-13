@@ -78,6 +78,8 @@ class Camera extends GameObject {
     });
   }
 
+  private isAnyKeyPressed = () => Object.values(this.wasdFlags).some((key) => !!key);
+
   get renderObject() {
     return new PIXI.Container();
   }
@@ -90,8 +92,16 @@ class Camera extends GameObject {
       return;
     }
 
-    const { W, A, S, D } = this.wasdFlags;
     const { center } = this.viewport;
+    if (
+      !this.isAnyKeyPressed() &&
+      Math.abs(center.x - this.target.x) < 1e-4 &&
+      Math.abs(center.y - this.target.y) < 1e-4
+    ) {
+      return;
+    }
+
+    const { W, A, S, D } = this.wasdFlags;
     const diagonalCameraSpeed = CAMERA_SPEED * 0.7;
 
     if (W && D) {
@@ -118,14 +128,7 @@ class Camera extends GameObject {
 
     this.smoothedTarget.x = lerp(center.x, this.target.x, CAMERA_SMOOTH_SPEED);
     this.smoothedTarget.y = lerp(center.y, this.target.y, CAMERA_SMOOTH_SPEED);
-
-    const distanceFromTarget = 1;
-    if (
-      Math.abs(center.x - this.target.x) > distanceFromTarget &&
-      Math.abs(center.y - this.target.y) > distanceFromTarget
-    ) {
-      this.viewport.moveCenter(this.smoothedTarget.x, this.smoothedTarget.y);
-    }
+    this.viewport.moveCenter(this.smoothedTarget.x, this.smoothedTarget.y);
   }
 }
 
