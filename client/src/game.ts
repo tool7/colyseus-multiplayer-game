@@ -3,6 +3,7 @@ import { Viewport } from "pixi-viewport";
 
 import { MAP_GRID_WIDTH, MAP_GRID_HEIGHT, MAP_GRID_CELL_SIZE } from "./utils/constants";
 import GameObject from "./models/game-object";
+import GameUI from "./core/game-ui";
 import Ship from "./core/ship";
 import WorldMap from "./core/world-map";
 import Camera from "./core/camera";
@@ -39,6 +40,9 @@ viewport.fit();
 viewport.moveCenter(viewport.worldWidth / 2, viewport.worldHeight / 2);
 
 window.onload = () => {
+  const gameUI = new GameUI();
+  app.stage.addChild(gameUI.renderObject);
+
   const worldMap = new WorldMap(worldConfig);
   gameObjects.push(worldMap);
   viewport.addChild(worldMap.renderObject);
