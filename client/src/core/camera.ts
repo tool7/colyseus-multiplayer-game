@@ -39,7 +39,7 @@ class Camera extends GameObject {
     this.viewport
       .drag({ mouseButtons: "middle" })
       .wheel({ smooth: 8, center: this.smoothedTarget })
-      .clampZoom({ maxScale: 1, minScale: 0.25 })
+      .clampZoom({ maxScale: 1.5, minScale: 0.5 })
       .animate({ ease: "linear", time: 1000 });
 
     this.viewport.on("zoomed", () => {
@@ -50,9 +50,9 @@ class Camera extends GameObject {
       this.isDragging = true;
     });
 
-    this.viewport.on("drag-end", (e) => {
-      this.target.x = this.viewport.center.x;
-      this.target.y = this.viewport.center.y;
+    this.viewport.on("drag-end", () => {
+      this.smoothedTarget.x = this.target.x = this.viewport.center.x;
+      this.smoothedTarget.y = this.target.y = this.viewport.center.y;
 
       this.isDragging = false;
     });
